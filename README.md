@@ -12,6 +12,6 @@ We will be using react with Vite, and Express.js to build pur project, and tools
 
 
 Each sprint will have it's own branch. 
-- **Sprint 1**: [link]
-- **Sprint 2**: [link]
-- **Sprint 3**: [link]
+- **Sprint 1**: [\[link\]](https://github.com/LeoLeerila/Ragebait-chess/tree/sprint-1)
+- **Sprint 2**: [\[link\]](https://github.com/LeoLeerila/Ragebait-chess/tree/sprint-2)
+- **Sprint 3**: [\[link\]](https://github.com/LeoLeerila/Ragebait-chess/tree/sprint-3)
