@@ -1,1 +1,3 @@
 This is Sprint 1 feature
+
+We had daily scrum, and built the prototype on Figma. We have trello and draw.io diagrams too to help.
