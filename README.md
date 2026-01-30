@@ -22,5 +22,11 @@ Functional requirements:
 - routing
 - functioning triggers for different events
 
+User stories:
+- *As a beginner, I want to be able to navigate between pages easily.*
+- *As an analytical user, I want to have access to statistics.*
+- *I would like to have a pretty interface with cool colours.*
+- *As a player, I want my opponents to feel unique.*
+
 [Trello](https://trello.com/b/QYtVZk0y/aishakki).
 Priority tasks like routing are highlighted with red.
