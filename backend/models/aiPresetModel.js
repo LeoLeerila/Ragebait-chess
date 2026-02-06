@@ -19,6 +19,10 @@ const aiSchema = new Schema({
     type: Number,
     required: true,
   },
+  aiDescription: {
+    type: Number,
+    required: true,
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('AiPreset', aiSchema);
