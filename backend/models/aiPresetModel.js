@@ -20,7 +20,7 @@ const aiSchema = new Schema({
     required: true,
   },
   aiDescription: {
-    type: Number,
+    type: String,
     required: true,
   },
 }, { timestamps: true });
