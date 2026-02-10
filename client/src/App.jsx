@@ -1,9 +1,13 @@
+
+//only for testing purpose
+
 import { useState } from 'react'
-import './App.css'
+import UserPanel from "./components/userPanel"
 
 function App() {
   return (
     <>
+      <UserPanel PlayerId="0"/>
     </>
   )
 }
