@@ -1,6 +1,9 @@
 import "../../components/userPanel.css"
 
-function EditProfile({player, pfp}){
+
+//EditProfile gets all data as a child from userpanel
+// player = Player Data
+function EditProfile({player, settings}){
     return(
     <div>
         <div id="sidetxt">
@@ -11,7 +14,7 @@ function EditProfile({player, pfp}){
             <p>Username: {player.Name}</p>
             <p>Email: {player.EMail}</p>
             <p>Password: {player.Password}</p>
-            <p>Profile picture:<br/><img src={pfp} alt="profilepic"/></p>
+            <p>Profile picture:<br/><img src={settings.ProfilePic} alt="profilepic"/></p>
             <p>Display on profile:</p>
             <div className="user_panel_side_txt">
                 <p>WIP</p>
