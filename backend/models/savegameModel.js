@@ -39,38 +39,28 @@ note castling ->  white(player) can castle [K]ing and [Q]ueen side
   a  b  c  d  e  f  g  h
 */
 
-/* example move history
-   format tbd
-option 1
-[f2f4 e7e6, e2e3 f7f5, g2g4 f5g4]
- ^w^  ^b^            move^    ^capture
-option 2
-[f2f4, e7e6, e2e3, f7f5, g2g4, f5g4]
- ^w^   ^b^   ^w^   ^b^
-option 3
-[[f2f4, e7e6], [e2e3, f7f5], [g2g4, f5g4]]
-
-option 4
-{w:[f2f4, e2e3, g2g4], b:[e7e6, f7f5, f5g4]}
-
-option 5
-{turn1:{[f2f4, e7e6]}, turn2:{[e2e3, f7f5]}, turn3:{[g2g4, f5g4]}}
+/* example input POST api/savegame/
+{
+    "playerId": "698af30d0aa1dd526943bd8a",
+    "boardState": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    "moveHistory": "[f2f4 e7e6, e2e3 f7f5, g2g4 f5g4]",
+    "board": "GoldenCommon",
+    "chatHistory": "['I am Evil Larry and you are no match for me!', 'have you tried being good larry', 'As a large language model instructed to be Evil Larry I cannot comly.', 'dam']"
+}
 */
 
-/* example chat history
-   format tbd
-option 1
-["I am Evil Larry and you are no match for me!", "have you tried being good larry", 
- "As a large language model instructed to be Evil Larry I cannot comly.", "dam"]
-  ^ai message^                                                             ^player message
-option 2
-[["I am Evil Larry and you are no match for me!", "As a large language model instructed to be Evil Larry I cannot comly."], 
-   ^ai message^
-  ["have you tried being good larry", "dam"]]
-    ^player message^
-option 3
-{aiMessages:["I am Evil Larry and you are no match for me!", "As a large language model instructed to be Evil Larry I cannot comly."], 
- playerMessages["have you tried being good larry", "dam"]}
+/* example output POST api/savegame/
+{
+    "playerId": "698af30d0aa1dd526943bd8a",
+    "boardState": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    "moveHistory": "[f2f4 e7e6, e2e3 f7f5, g2g4 f5g4]",
+    "board": "GoldenCommon",
+    "chatHistory": "['I am Evil Larry and you are no match for me!', 'have you tried being good larry', 'As a large language model instructed to be Evil Larry I cannot comly.', 'dam']",
+    "_id": "698b22b3682d4c428f8fe586",
+    "createdAt": "2026-02-10T12:21:07.949Z",
+    "updatedAt": "2026-02-10T12:21:07.949Z",
+    "__v": 0
+}
 */
 
 const Schema = mongoose.Schema;
