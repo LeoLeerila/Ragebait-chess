@@ -13,7 +13,7 @@ const {
 router.get("/", getAllSavegames);
 
 // POST /savegames
-router.post("/", createSavegame);
+router.post("/", createSavegame); // Create new SaveGame
 
 // GET /savegames/:savegameId
 router.get("/:savegameId", getSavegameById);

@@ -9,19 +9,19 @@ const {
   // patchStats
 } = require("../controllers/statsControllers");
  
-// GET /statss
+// GET /stats
 router.get("/", getAllStatss);
 
-// POST /statss
-router.post("/", createStats);
+// POST /stats
+router.post("/", createStats); // Create new player Stats (run only once)
 
-// GET /statss/:statsId
+// GET /stats/:statsId
 router.get("/:statsId", getStatsById);
 
-// PUT /statss/:statsId
+// PUT /stats/:statsId
 router.put("/:statsId", updateStats);
 
-// DELETE /statss/:statsId
+// DELETE /stats/:statsId
 router.delete("/:statsId", deleteStats);
 
 // Update stats using PATCH 

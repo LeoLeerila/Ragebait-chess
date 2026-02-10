@@ -13,7 +13,7 @@ const {
 router.get("/", getAllPlayers);
 
 // POST /players
-router.post("/", createPlayer);
+router.post("/", createPlayer); // Create new player
 
 // GET /players/:playerId
 router.get("/:playerId", getPlayerById);

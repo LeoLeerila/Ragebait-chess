@@ -13,7 +13,7 @@ const {
 router.get("/", getAllSettingss);
 
 // POST /settingss
-router.post("/", createSettings);
+router.post("/", createSettings); // Create new player Settings (run only once)
 
 // GET /settingss/:settingsId
 router.get("/:settingsId", getSettingsById);
