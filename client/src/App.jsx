@@ -1,15 +1,17 @@
-
-//only for testing purpose
-
-import { useState } from 'react'
 import UserPanel from "./components/userPanel"
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+
+
 
 function App() {
   return (
-    <>
-      <UserPanel PlayerId="2"/>
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/user" element={<UserPanel PlayerId="1" />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
