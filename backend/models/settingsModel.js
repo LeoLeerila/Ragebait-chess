@@ -41,6 +41,10 @@ const settingsSchema = new Schema({
     type: String,
     required: true,
   },
+  showProfileStats: {
+    type: String,
+    required: true,
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Settings', settingsSchema);
