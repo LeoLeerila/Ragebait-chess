@@ -4,11 +4,12 @@ import "../../components/userPanel.css"
 //EditProfile gets all data as a child from userpanel
 // player = Player Data
 function EditProfile({player, settings}){
+
     return(
     <div>
         <div id="sidetxt">
             <h2>Edit Profile</h2>
-            <button>/edit/</button>
+            <button className="btn_open_edit" >/edit/</button>
         </div>
         <div>
             <p>Username: {player.Name}</p>
@@ -25,7 +26,7 @@ function EditProfile({player, settings}){
         <div className="user_panel_side_txt">
             <p>Reset profile?</p>
             <p>Delete profile?</p>
-        </div>
+        </div>    
     </div>
     )
 }

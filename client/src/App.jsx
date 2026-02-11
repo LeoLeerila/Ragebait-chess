@@ -7,7 +7,7 @@ import UserPanel from "./components/userPanel"
 function App() {
   return (
     <>
-      <UserPanel PlayerId="0"/>
+      <UserPanel PlayerId="2"/>
     </>
   )
 }
