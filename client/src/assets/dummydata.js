@@ -1,6 +1,6 @@
 import png from "./react.svg";
 import png2 from "./evillarry.png";
-
+import png3 from "./goobert.png";
 export const RawPlayerData = [{
     PlayerId : "1",
     Name:"ok",
@@ -21,6 +21,13 @@ export const RawPlayerData = [{
     Password:"evil4life",
     EMail:"evillarry@mau.mau",
     Date:"30.1.2025"
+},
+{
+    PlayerId:"4",
+    Name:"Goobert",
+    Password:"G00bErt_1s_tHe_8est",
+    EMail:"goobert@mau.mau",
+    Date:"12.2.2025"
 }]
 
 export const RawStats = [{
@@ -50,6 +57,16 @@ export const RawStats = [{
     StalemateMatches:"1",
     AIForfeit:"400",
     CurrentELO:"1800",
+    HighestELO:"2147483647",
+    CheckmatePiece:"King"
+},
+{
+    PlayerId:"4",
+    TotalMatches:"1000",
+    WonMatches:"999",
+    StalemateMatches:"1",
+    AIForfeit:"400",
+    CurrentELO:"2100",
     HighestELO:"2147483647",
     CheckmatePiece:"King"
 }
@@ -82,6 +99,18 @@ export const RawSettings = [{
     BoardStyle:"default",
     LDMode:"dark",
     ProfilePic: png2,
+    ShowProfileStats: {
+        ShowElo: true,
+        ShowWL:true,
+        ShowDate:true
+    }
+
+},
+{
+    PlayerId:"4",
+    BoardStyle:"default",
+    LDMode:"dark",
+    ProfilePic:png3,
     ShowProfileStats: {
         ShowElo: true,
         ShowWL:true,

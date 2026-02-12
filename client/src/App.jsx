@@ -1,10 +1,14 @@
-import { useState } from 'react'
-import './App.css'
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import GameStart from './gameStart';
-import Game from './Game';
-import UserPanel from './components/userPanel';
-import Header from './components/Header';
+import UserPanel from "./components/userPanel";
+import LandingPage from "./components/LandingPage";
+import RegisterForm from "./components/Register";
+import LoginForm from "./components/Login";
+import Header from "./components/Header";
+import GameStart from './components/gameStart';
+import Game from './components/Game';
+import { Route, Routes } from "react-router-dom";
+import './App.css';
+
+
 function App() {
   return (
     <>
