@@ -57,6 +57,9 @@ function UserPanel(){
         e.preventDefault();
         toggleEdit()
     }
+    function editHandle(){
+        setEdit(!openEdit)
+    }
 
 
     return(
@@ -112,7 +115,7 @@ function UserPanel(){
                     <div className="userPanel_edit">
                         <div id="sidetxt">
                             <h2>Edit Profile</h2>
-                            <button className="btn_open_edit"  >/edit/</button>
+                            <button className="btn_open_edit" onClick={editHandle}>/edit/</button>
                         </div>
                         {openEdit ?
                             <div className="editModal">
