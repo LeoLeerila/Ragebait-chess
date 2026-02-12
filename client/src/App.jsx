@@ -14,7 +14,7 @@ function App() {
           {/* <Route path="/" element={<Home />} /> */}
           <Route path="/" element={<GameStart />} />
           <Route path="/game" element={<Game />} />
-          <Route path="/user" element={<UserPanel PlayerId="0" />} />
+          <Route path="/user/:PlayerId" element={<UserPanel />} />
         </Routes>
       {/* <Footer /> */}
     </>

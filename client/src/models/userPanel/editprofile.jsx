@@ -4,32 +4,17 @@ import React, { useEffect, useState } from "react";
 //EditProfile gets all data as a child from userpanel
 // player = Player Data
 function EditProfile({player, settings}){
-
-    /*
-    useEffect(()=>{
     const [openEdit, setEdit] = useState(false)
+/*
+    useEffect(async()=>{
+        onClick={setEdit(!openEdit)}
+    },[openEdit])
+*/
 
-    function toggleEdit(){
-        setEdit(!openEdit)
-    }
     const onSubmit = async (e) =>{
         e.preventDefault();
         toggleEdit()
     }
-onClick={toggleEdit()}
-    },[])        <div className="editModal">
-            <div className="edtOverall">
-                <div className="editModal_content">
-                    <form className="editForm" onSubmit={onSubmit}>
-                        <h2 className="editForm_txt">Edit</h2>
-                        <input type="text" placeholder="Name" />
-                        <input type="email" placeholder="Email"/>
-                        <button className="btn_submit">Submit</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    */
 
     return(
     <div>
@@ -37,7 +22,19 @@ onClick={toggleEdit()}
             <h2>Edit Profile</h2>
             <button className="btn_open_edit"  >/edit/</button>
         </div>
-
+        {openEdit ?
+            <div className="editModal">
+                <div className="edtOverall">
+                    <div className="editModal_content">
+                        <form className="editForm" onSubmit={onSubmit}>
+                            <h2 className="editForm_txt">Edit</h2>
+                            <input type="text" placeholder="Name" />
+                            <input type="email" placeholder="Email"/>
+                            <button className="btn_submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>:null}
         <div>
             <p>Username: {player.Name}</p>
             <p>Email: {player.EMail}</p>

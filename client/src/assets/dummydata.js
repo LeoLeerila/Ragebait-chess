@@ -59,13 +59,23 @@ export const RawSettings = [{
     PlayerId:"1",
     BoardStyle:"default",
     LDMode:"dark",
-    ProfilePic: png
+    ProfilePic: png,
+    ShowProfileStats: {
+        ShowElo: true,
+        ShowWL:false,
+        ShowDate:true
+    }
 },
 {
     PlayerId:"2",
     BoardStyle:"default",
     LDMode:"dark",
-    ProfilePic: png
+    ProfilePic: png,
+    ShowProfileStats: {
+        ShowElo: true,
+        ShowWL:true,
+        ShowDate:false
+    }
 },
 {
     PlayerId:"0",
