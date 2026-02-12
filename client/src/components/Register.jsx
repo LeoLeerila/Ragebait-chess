@@ -1,4 +1,5 @@
 import {useState} from "react";
+import { Link } from "react-router-dom";
 import "./Register.css";
 
 //simple registration form function taking inspiration from the first coding marathon's BookCollectionManager.jsx
@@ -77,7 +78,7 @@ function RegisterForm() {
                     Register now
                 </button>
                 {/*this should have a link to the login page eventually when I actually make the login page.*/}
-                <p className="login-text">Already have an account? Click here to sign in.</p>
+                <p className="login-text">Already have an account? <Link to="/login">Click here to sign in.</Link></p>
             </form>
         </div>
     )

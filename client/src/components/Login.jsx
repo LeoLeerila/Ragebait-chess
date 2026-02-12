@@ -1,4 +1,5 @@
 import {useState} from "react";
+import { Link } from "react-router-dom";
 import "./Login.css";
 
 //simple login form function made based on Register.jsx
@@ -48,7 +49,7 @@ function LoginForm() {
                     Sign in
                 </button>
                 {/*this should have a link to the registration page*/}
-                <p className="register-text">Don't have an account yet? Click here to register an account.</p>
+                <p className="register-text">Don't have an account yet? <Link to="/register">Click here to register an account.</Link></p>
             </form>
         </div>
     )

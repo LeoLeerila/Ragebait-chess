@@ -5,6 +5,7 @@ import Statistic from "../models/userPanel/statistic"
 
 import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./userPanel.css";
 
 
@@ -61,8 +62,8 @@ function UserPanel(PlayerId){
                 <div className="user_panel_inner" id="user_panel_stats">
                     <Statistic stats={StatsD[PlayerId]}/>
                     <div className="Buttons">
-                        <button>Back to main menu (wip)</button>
-                        <button>Start a new Game (wip)</button>
+                        <Link className="user_panel_link" to="/">Back to home</Link>
+                        <Link className="user_panel_link" to="/start">Start a new Game</Link>
                     </div>
                 </div>
                 <div className="user_panel_inner" id="user_panel_editprofile">

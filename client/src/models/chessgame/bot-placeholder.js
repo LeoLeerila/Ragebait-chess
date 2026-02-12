@@ -1,4 +1,4 @@
-import larry from "./assets/larry.png"
+import larry from "../../assets/larry.png";
 export const bots = [
     {
         id: 1,

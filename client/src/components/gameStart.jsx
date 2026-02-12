@@ -1,6 +1,6 @@
 import './gameStart.css'
-import Bot from './BotComponent'
-import { bots } from './bot-placeholder'
+import Bot from '../models/chessgame/BotComponent'
+import { bots } from '../models/chessgame/bot-placeholder'
 import { React, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 //get BOT LIST data

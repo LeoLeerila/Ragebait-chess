@@ -1,8 +1,8 @@
 import './Game.css'
 import { React, useState } from 'react'
 import { useNavigate } from "react-router-dom";
-import Chessboard from './components/Chessboard';
-import { initBoard } from './components/initBoard';
+import Chessboard from '../models/chessgame/Chessboard';
+import { initBoard } from '../models/chessgame/initBoard';
 const Game = () => {
     //set the starting board so it can be used to build the start of the game
     const [board, setboard] = useState(initBoard);

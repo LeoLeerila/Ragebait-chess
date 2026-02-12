@@ -1,4 +1,5 @@
 import "./Header.css";
+import { Link } from "react-router-dom";
 
 function Header() {
     return (
@@ -9,8 +10,8 @@ function Header() {
             {/*these buttons are supposed to have the "user" and "logout" logos like in the Figma prototype,
              but getting those isn't a priority yet */}
             <div className="header-buttons">
-                <button className="user-button">User</button>
-                <button className="logout-button">Logout</button>
+                <Link to="/user" className="header-btn">User</Link>
+                <button className="header-btn">Logout</button>
             </div>
         </header>
     )
