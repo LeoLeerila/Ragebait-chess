@@ -1,15 +1,10 @@
-import UserPanel from "./components/userPanel";
-import LandingPage from "./components/LandingPage";
-import RegisterForm from "./components/Register";
-import LoginForm from "./components/Login";
-import Header from "./components/Header";
-import GameStart from './components/gameStart';
-import Game from './components/Game';
-import { Route, Routes } from "react-router-dom";
-import './App.css';
-
-
-
+import { useState } from 'react'
+import './App.css'
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import GameStart from './gameStart';
+import Game from './Game';
+import UserPanel from './components/userPanel';
+import Header from './components/Header';
 function App() {
   return (
     <>
@@ -20,7 +15,7 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/start" element={<GameStart />} />
           <Route path="/game" element={<Game />} />
-          <Route path="/user" element={<UserPanel PlayerId="1" />} />
+          <Route path="/user/:PlayerId" element={<UserPanel />} />
         </Routes>
     </>
   )
