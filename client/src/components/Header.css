@@ -1,0 +1,12 @@
+header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #393B45;
+}
+
+.header-title {
+    padding-left: 1rem;
+    color: #9FC5E0;
+}
