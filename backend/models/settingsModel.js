@@ -33,19 +33,20 @@ const settingsSchema = new Schema({
   },
   boardStyle: {
     type: String,
-    required: true,
+    default: "GoldenCommon",
   },
   theme: {
     type: Boolean,
-    required: true,
+    default: true,
   },
   profilePic: {
     type: String,
-    required: true,
+    default: "path/to/pfp.png",
   },
   showProfileStats: {
-    type: String,
-    required: true,
+    ShowElo:{ type: Boolean, default: true}, 
+    ShowWL: { type: Boolean, default: true},
+    ShowDate: { type: Boolean, default: true}
   }
 }, { timestamps: true });
 

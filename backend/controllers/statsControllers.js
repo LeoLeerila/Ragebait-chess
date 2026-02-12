@@ -32,7 +32,7 @@ const mongoose = require("mongoose");
 */
 
 // GET /statss
-const getAllStatss = async (req, res) => {
+const getAllStats = async (req, res) => {
   try {
     const statss = await Stats.find({}).sort({ createdAt: -1 });
     res.status(200).json(statss);
@@ -40,7 +40,8 @@ const getAllStatss = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve statss" });
   }
 };
- 
+
+/* 
 // POST /statss
 const createStats = async (req, res) => {
   try {
@@ -50,6 +51,7 @@ const createStats = async (req, res) => {
     res.status(400).json({ message: "Failed to create stats", error: error.message });
   }
 };
+ */
 
 // GET /statss/:statsId
 const getStatsById = async (req, res) => {
@@ -116,9 +118,9 @@ const deleteStats = async (req, res) => {
 };
 
 module.exports = {
-  getAllStatss,
+  getAllStats,
   getStatsById,
-  createStats,
+  //createStats,
   updateStats,
   deleteStats,
 };

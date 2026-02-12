@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getAllStatss,
+  getAllStats,
   getStatsById,
   createStats,
   updateStats,
@@ -40,10 +40,10 @@ const {
 */
  
 // GET /stats
-router.get("/", getAllStatss);
+router.get("/", getAllStats);
 
 // POST /stats
-router.post("/", createStats); // Create new player Stats (run only once)
+//router.post("/", createStats); // Create new player Stats (run only once)
 
 // GET /stats/:statsId
 router.get("/:statsId", getStatsById);

@@ -34,7 +34,8 @@ const getAllSettingss = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve settingss" });
   }
 };
- 
+
+/* 
 // POST /settingss
 const createSettings = async (req, res) => {
   try {
@@ -44,6 +45,7 @@ const createSettings = async (req, res) => {
     res.status(400).json({ message: "Failed to create settings", error: error.message });
   }
 };
+ */
 
 // GET /settingss/:settingsId
 const getSettingsById = async (req, res) => {
@@ -112,7 +114,7 @@ const deleteSettings = async (req, res) => {
 module.exports = {
   getAllSettingss,
   getSettingsById,
-  createSettings,
+  //createSettings,
   updateSettings,
   deleteSettings,
 };
