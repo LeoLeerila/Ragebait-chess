@@ -65,8 +65,8 @@ function UserPanel(){
                 <div id="profile_txt">
                     <img src={SettingsD[t_PlayerId].ProfilePic} alt="profilepic"/>
                     <p>{PlayerD[t_PlayerId].Name}</p>
-                    {SettingsD[t_PlayerId].ShowProfileStats.ShowElo ? <p>Current ELO: {StatsD.CurrentELO}</p>:<p/>}
-                    {SettingsD[t_PlayerId].ShowProfileStats.ShowWL ?<p>Won: {StatsD.WonMatches} Played: {StatsD.TotalMatches}</p>:<p/>}
+                    {SettingsD[t_PlayerId].ShowProfileStats.ShowElo ? <p>Current ELO: {StatsD[t_PlayerId].CurrentELO}</p>:<p/>}
+                    {SettingsD[t_PlayerId].ShowProfileStats.ShowWL ?<p>Won: {StatsD[t_PlayerId].WonMatches} Played: {StatsD[t_PlayerId].TotalMatches}</p>:<p/>}
                     {SettingsD[t_PlayerId].ShowProfileStats.ShowDate ?<p>Date of register: {PlayerD[t_PlayerId].Date}</p>:<p/>}
                 </div> 
             </div>
