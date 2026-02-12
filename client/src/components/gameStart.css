@@ -171,3 +171,8 @@
 #start-game:hover {
     background: var(--grey-colour);
 }
+
+.form-error {
+    color: red;
+    font-size: 0.85rem;
+}

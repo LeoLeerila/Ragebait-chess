@@ -1,4 +1,7 @@
 import larry from "../../assets/larry.png";
+import harry from "../../assets/harry.jpg";
+import randy from "../../assets/randy.jpg";
+
 export const bots = [
     {
         id: 1,
@@ -12,13 +15,13 @@ export const bots = [
         AIName: "Randy",
         info: "Randy is a bit special.",
         AIElo: 400,
-        AIPic: larry
+        AIPic: randy
     },
     {
         id: 3,
         AIName: "Harry",
         info: "Harry is a difficult opponent with a chill attitude.",
         AIElo: 2500,
-        AIPic: larry
+        AIPic: harry
     }
 ]
