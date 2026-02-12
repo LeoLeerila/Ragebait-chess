@@ -1,0 +1,13 @@
+:root {
+  --dark-colour: #393B45;
+  --grey-colour: #7C808A;
+  --silver-colour: #BCB8B1;
+  --light-colour: #F4F3EE;
+  --powder-blue: #9FC5E0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--light-colour);
+}

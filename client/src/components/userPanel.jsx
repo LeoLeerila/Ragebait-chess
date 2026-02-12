@@ -1,8 +1,11 @@
+//these are dummydata for use before database
 import EditProfile from "../models/userPanel/editprofile"
 import Profile from "../models/userPanel/profile"
 import Statistic from "../models/userPanel/statistic"
+
 import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./userPanel.css";
 
 
@@ -18,10 +21,7 @@ import "./userPanel.css";
 
 function UserPanel(PlayerId){
 
-    //playerid is in this format {PlayerId: number}
-    PlayerId = PlayerId.PlayerId
-
-
+    
     //find by id here 
     //use that for data
 
@@ -30,8 +30,27 @@ function UserPanel(PlayerId){
     const [PlayerD, setPlayer] = useState(RawPlayerData);
     const [SettingsD, setSettings] = useState(RawSettings);
     const [StatsD, setStats] = useState(RawStats);
-    
 
+
+
+
+    //this is temporary, when database is working it will use different method
+    //playerid is in this format {PlayerId: number}
+    PlayerId = PlayerId.PlayerId;
+    let pFound = false
+    for(let i = 0; i < PlayerD.length;) {
+        if(PlayerD[i].PlayerId == PlayerId){
+            PlayerId = i;
+            pFound = true;
+            break
+        }else{
+            i++;
+        }
+    };
+    //it will throw alert when data not found in dummydata file
+    if(!pFound){
+        alert("player data not found")
+    };
 
 
     return(
@@ -43,8 +62,8 @@ function UserPanel(PlayerId){
                 <div className="user_panel_inner" id="user_panel_stats">
                     <Statistic stats={StatsD[PlayerId]}/>
                     <div className="Buttons">
-                        <button>Back to main menu (wip)</button>
-                        <button>Start a new Game (wip)</button>
+                        <Link className="user_panel_link" to="/">Back to home</Link>
+                        <Link className="user_panel_link" to="/start">Start a new Game</Link>
                     </div>
                 </div>
                 <div className="user_panel_inner" id="user_panel_editprofile">

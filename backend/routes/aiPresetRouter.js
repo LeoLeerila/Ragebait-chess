@@ -13,7 +13,7 @@ const {
 router.get("/", getAllAiPresets);
 
 // POST /aiPresets
-router.post("/", createAiPreset);
+router.post("/", createAiPreset); // create new aipreset
 
 // GET /aiPresets/:aiPresetId
 router.get("/:aiPresetId", getAiPresetById);

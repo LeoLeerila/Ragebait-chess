@@ -1,10 +1,10 @@
 .user_panel_inner {
-  border: 15px solid green;
+  border: 15px solid var(--powder-blue);
   padding: 20px;
   margin: 20px;
 }
 .user_panel_statistic{
-  border: 15px solid green;
+  border: 15px solid var(--powder-blue);
   padding: 20px;
   margin: 10px;
   text-align: center;
@@ -31,3 +31,10 @@
   display: flex;
   gap: 20px;
   }
+
+a.user_panel_link {
+  padding: 10px;
+  text-decoration: none;
+  color: var(--dark-colour);
+}
+

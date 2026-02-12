@@ -8,12 +8,34 @@ const {
   deleteSettings,
   // patchSettings
 } = require("../controllers/settingsControllers");
+
+/* example input POST api/settings/
+{
+    "playerId": "698af30d0aa1dd526943bd8a",
+    "boardStyle": "GoldenCommon",
+    "theme": false,
+    "profilePic": "path/to/pfp.png"
+}
+*/
+
+/* example output POST api/settings/
+{
+    "playerId": "698af30d0aa1dd526943bd8a",
+    "boardStyle": "GoldenCommon",
+    "theme": false,
+    "profilePic": "path/to/pfp.png",
+    "_id": "698b24f05fdbb8c493af9612",
+    "createdAt": "2026-02-10T12:30:40.042Z",
+    "updatedAt": "2026-02-10T12:30:40.042Z",
+    "__v": 0
+}
+*/
  
 // GET /settingss
 router.get("/", getAllSettingss);
 
 // POST /settingss
-router.post("/", createSettings);
+router.post("/", createSettings); // Create new player Settings (run only once)
 
 // GET /settingss/:settingsId
 router.get("/:settingsId", getSettingsById);
