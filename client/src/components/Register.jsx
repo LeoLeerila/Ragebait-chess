@@ -42,6 +42,7 @@ function RegisterForm() {
                 value={form.displayname}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <input
                 type="email"
@@ -50,6 +51,7 @@ function RegisterForm() {
                 value={form.email}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <p className="password-text">Make your password secure!
                 Recommended: 8 characters with upper and lowercase letters, including a unique character.</p>
@@ -60,6 +62,7 @@ function RegisterForm() {
                 value={form.password}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <input
                 type="password"
@@ -68,6 +71,7 @@ function RegisterForm() {
                 value={form.confirmPassword}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <button type="submit" className="register-button">
                     Register now

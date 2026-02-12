@@ -33,6 +33,7 @@ function LoginForm() {
                 value={form.email}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <input
                 type="password"
@@ -41,6 +42,7 @@ function LoginForm() {
                 value={form.password}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <button type="submit" className="login-button">
                     Sign in
