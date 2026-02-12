@@ -45,14 +45,14 @@ router.get("/", getAllStats);
 // POST /stats
 //router.post("/", createStats); // Create new player Stats (run only once)
 
-// GET /stats/:statsId
-router.get("/:statsId", getStatsById);
+// GET /stats/:playerId
+router.get("/:playerId", getStatsById);
 
-// PUT /stats/:statsId
-router.put("/:statsId", updateStats);
+// PUT /stats/:playerId
+router.put("/:playerId", updateStats);
 
-// DELETE /stats/:statsId
-router.delete("/:statsId", deleteStats);
+// DELETE /stats/:playerId
+router.delete("/:playerId", deleteStats);
 
 // Update stats using PATCH 
 // router.patch('/:statsId', patchStats)

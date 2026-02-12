@@ -53,16 +53,16 @@ const createStats = async (req, res) => {
 };
  */
 
-// GET /statss/:statsId
+// GET /statss/:playerId
 const getStatsById = async (req, res) => {
-  const { statsId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(statsId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
   }
 
   try {
-    const stats = await Stats.findById(statsId);
+    const stats = await Stats.findOne({playerId});
     if (stats) {
       res.status(200).json(stats);
     } else {
@@ -73,17 +73,17 @@ const getStatsById = async (req, res) => {
   }
 };
 
-// PUT /statss/:statsId
+// PUT /statss/:playerId
 const updateStats = async (req, res) => {
-  const { statsId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(statsId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
   }
 
   try {
     const updatedStats = await Stats.findOneAndReplace(
-      { _id: statsId },
+      { playerId: playerId },
       { ...req.body },
       { new: true }
     );
@@ -97,16 +97,16 @@ const updateStats = async (req, res) => {
   }
 };
 
-// DELETE /statss/:statsId
+// DELETE /statss/:playerId
 const deleteStats = async (req, res) => {
-  const { statsId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(statsId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
   }
 
   try {
-    const deletedStats = await Stats.findOneAndDelete({ _id: statsId });
+    const deletedStats = await Stats.findOneAndDelete({ playerId: playerId });
     if (deletedStats) {
       res.status(200).json({ message: "Stats deleted successfully" });
     } else {

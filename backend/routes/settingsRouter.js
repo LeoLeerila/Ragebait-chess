@@ -39,14 +39,14 @@ router.get("/", getAllSettingss);
 // POST /settingss
 //router.post("/", createSettings); // Create new player Settings (run only once)
 
-// GET /settingss/:settingsId
-router.get("/:settingsId", getSettingsById);
+// GET /settingss/:playerId
+router.get("/:playerId", getSettingsById);
 
-// PUT /settingss/:settingsId
-router.put("/:settingsId", updateSettings);
+// PUT /settingss/:playerId
+router.put("/:playerId", updateSettings);
 
-// DELETE /settingss/:settingsId
-router.delete("/:settingsId", deleteSettings);
+// DELETE /settingss/:playerId
+router.delete("/:playerId", deleteSettings);
 
 // Update settings using PATCH 
 // router.patch('/:settingsId', patchSettings)
