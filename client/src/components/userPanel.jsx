@@ -16,7 +16,7 @@ import "./userPanel.css";
 //editprofile
 //{PlayerD.map((player)=>{return <EditProfile {...player} key={player.PlayerId} player={player} pfp={SettingsD.map((settings)=>settings.ProfilePic)}/> })}  
 
-//userpanel will get playerId from other sources so yeah
+
 
 function UserPanel(){
     const {PlayerId} = useParams(); 
@@ -24,8 +24,14 @@ function UserPanel(){
     const [PlayerD, setPlayer] = useState(RawPlayerData);
     const [SettingsD, setSettings] = useState(RawSettings);
     const [StatsD, setStats] = useState(RawStats);
-    const [openEdit, setEdit] = useState(false)
 
+    const [openEdit, setEdit] = useState(false)
+    const [Name, setName] = useState("")
+    const [EMail, setEmail] = useState("")
+    const [Password, setPassw] = useState("")
+    const [ShowElo, setShowElo] = useState()
+    const [ShowWL, setShowWL] = useState()
+    const [ShowDate, setShowDate] = useState()
 
 
 //this is temporary, when database is working it will use different method
@@ -45,19 +51,31 @@ function UserPanel(){
         alert("player data not found")
     };
 
-
-
     useEffect(()=>{
-
+        console.log("hi")
         //fetch logi here
-
-
+        setName(PlayerD[t_PlayerId].Name)
+        setEmail(PlayerD[t_PlayerId].EMail)
+        setPassw(PlayerD[t_PlayerId].Password)
+        setShowElo(SettingsD[t_PlayerId].ShowProfileStats.ShowElo)
+        setShowWL(SettingsD[t_PlayerId].ShowProfileStats.ShowWL)
+        setShowDate(SettingsD[t_PlayerId].ShowProfileStats.ShowDate)
     },[])
 
     const onSubmit = async (e) =>{
-        e.preventDefault();
-        toggleEdit()
+        e.preventDefault()
+        const newData = PlayerD.map(obj =>{
+            console.log(obj)
+            if(obj.PlayerId === PlayerId){
+                console.log("true")
+                return{...obj, Name, EMail, Password};
+            }
+            return obj;
+        });
+        console.log(newData)
+        setPlayer(newData)
     }
+
     function editHandle(){
         setEdit(!openEdit)
     }
@@ -69,9 +87,9 @@ function UserPanel(){
                 <div id="profile_txt">
                     <img src={SettingsD[t_PlayerId].ProfilePic} alt="profilepic"/>
                     <p>{PlayerD[t_PlayerId].Name}</p>
-                    {SettingsD[t_PlayerId].ShowProfileStats.ShowElo ? <p>Current ELO: {StatsD[t_PlayerId].CurrentELO}</p>:<p/>}
-                    {SettingsD[t_PlayerId].ShowProfileStats.ShowWL ?<p>Won: {StatsD[t_PlayerId].WonMatches} Played: {StatsD[t_PlayerId].TotalMatches}</p>:<p/>}
-                    {SettingsD[t_PlayerId].ShowProfileStats.ShowDate ?<p>Date of register: {PlayerD[t_PlayerId].Date}</p>:<p/>}
+                    {ShowElo ? <p>Current ELO: {StatsD[t_PlayerId].CurrentELO}</p>:<p/>}
+                    {ShowWL ?<p>Won: {StatsD[t_PlayerId].WonMatches} Played: {StatsD[t_PlayerId].TotalMatches}</p>:<p/>}
+                    {ShowDate ?<p>Date of register: {PlayerD[t_PlayerId].Date}</p>:<p/>}
                 </div> 
             </div>
             <div className="user_panel_lower">
@@ -116,7 +134,7 @@ function UserPanel(){
                     <div className="userPanel_edit">
                         <div id="sidetxt">
                             <h2>Edit Profile</h2>
-                            <button className="btn_open_edit" onClick={editHandle}>/edit/</button>
+                            <button className="btn_open_edit" onClick={editHandle} >/edit/</button>
                         </div>
                         {openEdit ?
                             <div className="editModal">
@@ -124,9 +142,10 @@ function UserPanel(){
                                     <div className="editModal_content">
                                         <form className="editForm" onSubmit={onSubmit}>
                                             <h2 className="editForm_txt">Edit</h2>
-                                            <input type="text" placeholder="Name" />
-                                            <input type="email" placeholder="Email"/>
-                                            <button className="btn_submit">Submit</button>
+                                            <input type="text" placeholder="Name" value={Name} onChange={(e) => setName(e.target.value)}/>
+                                            <input type="email" placeholder="Email" value={EMail} onChange={(e) => setEmail(e.target.value)}/>
+                                            <input type="txt" placeholder="Password" value={Password} onChange={(e) => setPassw(e.target.value)}/>
+                                            <button className="btn_submit" type="submit" >Submit</button>
                                         </form>
                                     </div>
                                 </div>
@@ -139,16 +158,16 @@ function UserPanel(){
                             <p>Display on profile:</p>
                             <div className="user_panel_side_txt">
                                 <div>
-                                    <label for="ShowEloRating">Elo Rating</label>
-                                    <input  type="checkbox" id="ShowEloRating"></input>
+                                    <label htmlFor="ShowEloRating">Elo Rating</label>
+                                    <input  type="checkbox" id="ShowEloRating" checked={ShowElo} value={ShowElo} onClick={(e) => setShowElo(!ShowElo)}></input>
                                 </div>
                                 <div>
-                                    <label for="ShowWLcount">W/L count</label>
-                                    <input type="checkbox" id="ShowWLcount"></input>
+                                    <label htmlFor="ShowWLcount">W/L count</label>
+                                    <input type="checkbox" id="ShowWLcount" checked={ShowWL} value={ShowWL}onClick={(e) => setShowWL(!ShowWL)}></input>
                                 </div>
                                 <div>
-                                    <label for="ShowDate">Register date</label>
-                                    <input type="checkbox" id="ShowDate"></input>
+                                    <label htmlFor="ShowDate">Register date</label>
+                                    <input type="checkbox" id="ShowDate" checked={ShowDate} value={ShowDate}onClick={(e) => setShowDate(!ShowDate)}></input>
                                 </div>
                             </div>
                         </div>
