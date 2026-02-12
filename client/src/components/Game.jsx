@@ -4,6 +4,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from '../models/chessgame/Chessboard';
 import { initBoard } from '../models/chessgame/initBoard';
 import GameOver from './gameOver';
+
+//these are dummydata for use before database
+import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
+
 const Game = () => {
     //useLocation: get the shit from gameStart.jsx through 'state'
     const location = useLocation();
@@ -18,6 +22,29 @@ const Game = () => {
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
     const navigate = useNavigate();
+    //semi temporary, needs to be changed after db
+    const [PlayerD, setPlayer] = useState(RawPlayerData);
+    const [SettingsD, setSettings] = useState(RawSettings);
+    const [StatsD, setStats] = useState(RawStats);
+
+    //this is temporary, when database is working it will use different method
+    let PlayerId = "4" //temp to change player in chatbox
+    let t_PlayerId = ""
+    let pFound = false
+    for(let i = 0; i < RawPlayerData.length;) {
+        if(RawPlayerData[i].PlayerId === PlayerId){
+            t_PlayerId = i;
+            pFound = true;
+            break
+        }else{
+            i++;
+        }
+    };
+    //it will throw alert when data not found in dummydata file
+    if(!pFound){
+        alert("player data not found")
+    };
+    
 
     function handleResign() {
         setGameOver(true);
@@ -79,10 +106,12 @@ const Game = () => {
 
                     {/* Bottom player, map the user data*/}
                     <div className="player-card bottom-player">
-                        <div className="avatar"></div>
+                        <div className="avatar">
+                            <img src={SettingsD[t_PlayerId].ProfilePic}/>
+                        </div>
                         <div className="player-info">
-                            <div className="player-name">Goobert</div>
-                            <div className="player-rating">2100 ELO</div>
+                            <div className="player-name">{PlayerD[t_PlayerId].Name}</div>
+                            <div className="player-rating">{StatsD[t_PlayerId].CurrentELO} ELO</div>
                         </div>
                         <div className="player-icon"></div>
                     </div>
