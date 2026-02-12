@@ -1,14 +1,18 @@
 import './Game.css'
 import { React, useState } from 'react'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from '../models/chessgame/Chessboard';
 import { initBoard } from '../models/chessgame/initBoard';
 import GameOver from './gameOver';
 const Game = () => {
+    //useLocation: get the shit from gameStart.jsx through 'state'
+    const location = useLocation();
+    const { opponent, playerSide, godmode } = location.state || {};
+
     //set the starting board so it can be used to build the start of the game
     const [board, setboard] = useState(initBoard);
     const [turn, setTurn] = useState("white");
-    //const [selected, setSelected] = useState(null);
+    const [selected, setSelected] = useState(null);
     const [history, setHistory] = useState([]);
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
@@ -17,6 +21,7 @@ const Game = () => {
 
     function handleResign() {
         setGameOver(true);
+        //Do not keep in final version. This is just to test the game over pop-up.
         setWinner(turn === "white" ? "black" : "white");
         setMethod("resignation");
     }
@@ -44,17 +49,16 @@ const Game = () => {
 
             {/* CHAT WINDOW */}
             <div className="right-panel">
-
-
                 <div className="chat-column">
                     {/* Top player, map the opponent details.*/}
                     <div className="player-card top-player">
-                        <div className="avatar"></div>
-                        <div className="player-info">
-                            <div className="player-name">Evil Larry</div>
-                            <div className="player-rating">1800 ELO</div>
+                        <div className="avatar">
+                            <img src={opponent.AIPic} alt={opponent.AIName} />
                         </div>
-                        <div className="player-icon"></div>
+                        <div className="player-info">
+                            <div className="player-name">{opponent.AIName}</div>
+                            <div className="player-rating">{opponent.AIElo}</div>
+                        </div>
                     </div>
 
                     {/* Map chat history, *TEMPORARY CODE* */}
