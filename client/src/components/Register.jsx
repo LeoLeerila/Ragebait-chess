@@ -1,4 +1,5 @@
 import {useState} from "react";
+import { Link } from "react-router-dom";
 import "./Register.css";
 
 //simple registration form function taking inspiration from the first coding marathon's BookCollectionManager.jsx
@@ -42,6 +43,7 @@ function RegisterForm() {
                 value={form.displayname}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <input
                 type="email"
@@ -50,6 +52,7 @@ function RegisterForm() {
                 value={form.email}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <p className="password-text">Make your password secure!
                 Recommended: 8 characters with upper and lowercase letters, including a unique character.</p>
@@ -60,6 +63,7 @@ function RegisterForm() {
                 value={form.password}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <input
                 type="password"
@@ -68,12 +72,13 @@ function RegisterForm() {
                 value={form.confirmPassword}
                 onChange={handleChange}
                 className="input-field"
+                required
                 />
                 <button type="submit" className="register-button">
                     Register now
                 </button>
                 {/*this should have a link to the login page eventually when I actually make the login page.*/}
-                <p className="login-text">Already have an account? Click here to sign in.</p>
+                <p className="login-text">Already have an account? <Link to="/login">Click here to sign in.</Link></p>
             </form>
         </div>
     )

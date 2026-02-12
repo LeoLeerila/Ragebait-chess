@@ -4,6 +4,7 @@ import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import { Link } from "react-router-dom";
 import "./userPanel.css";
 
 
@@ -105,8 +106,8 @@ function UserPanel(){
                         </div>
                     </div>
                     <div className="Buttons">
-                        <button >Back to main menu (wip)</button>
-                        <button >Start a new Game (wip)</button>
+                        <Link className="user_panel_link" to="/">Back to home</Link>
+                        <Link className="user_panel_link" to="/start">Start a new Game</Link>
                     </div>
                 </div>
 

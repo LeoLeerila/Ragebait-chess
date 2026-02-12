@@ -10,3 +10,18 @@ header {
     padding-left: 1rem;
     color: #9FC5E0;
 }
+
+.header-btn {
+    margin-right: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: 2px solid var(--light-colour);
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+a.header-btn, button {
+    text-decoration: none;
+    color: var(--light-colour);
+}

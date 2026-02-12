@@ -9,14 +9,14 @@ function App() {
   return (
     <>
       <Header />
-
         <Routes>
-          {/* <Route path="/" element={<Home />} /> */}
-          <Route path="/" element={<GameStart />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/start" element={<GameStart />} />
           <Route path="/game" element={<Game />} />
           <Route path="/user/:PlayerId" element={<UserPanel />} />
         </Routes>
-      {/* <Footer /> */}
     </>
   )
 }
