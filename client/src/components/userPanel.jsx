@@ -5,6 +5,7 @@ import Statistic from "../models/userPanel/statistic"
 
 import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
 import React, { useEffect, useState } from "react";
+
 import "./userPanel.css";
 
 
@@ -19,11 +20,7 @@ import "./userPanel.css";
 //userpanel will get playerId from other sources so yeah
 
 function UserPanel(PlayerId){
-
-    
-    //find by id here 
-    //use that for data
-
+    //const {PlayerId} = useParams();
 
     //using rn PlayerId as a number for the array to get objects
     const [PlayerD, setPlayer] = useState(RawPlayerData);
@@ -31,14 +28,20 @@ function UserPanel(PlayerId){
     const [StatsD, setStats] = useState(RawStats);
 
 
+    /*
+    useEffect(()=>{
+        //fetch logic here
+    },[])
+    */
 
 
+    
     //this is temporary, when database is working it will use different method
     //playerid is in this format {PlayerId: number}
     PlayerId = PlayerId.PlayerId;
     let pFound = false
     for(let i = 0; i < PlayerD.length;) {
-        if(PlayerD[i].PlayerId == PlayerId){
+        if(PlayerD[i].PlayerId === PlayerId){
             PlayerId = i;
             pFound = true;
             break
@@ -52,6 +55,19 @@ function UserPanel(PlayerId){
     };
 
 
+
+    //also temporary
+    /*
+    let count = 0;
+    function nextData(){
+        if(count < PlayerD.length){
+            PlayerId
+        }
+    };*/
+
+
+    console.log(SettingsD[PlayerId].ShowProfileStats)
+
     return(
         <section className="user_panel" id="user_panel">
             <div className="user_panel_inner" id="user_panel_profile">
@@ -61,15 +77,14 @@ function UserPanel(PlayerId){
                 <div className="user_panel_inner" id="user_panel_stats">
                     <Statistic stats={StatsD[PlayerId]}/>
                     <div className="Buttons">
-                        <button>Back to main menu (wip)</button>
-                        <button>Start a new Game (wip)</button>
+                        <button >Back to main menu (wip)</button>
+                        <button >Start a new Game (wip)</button>
                     </div>
                 </div>
                 <div className="user_panel_inner" id="user_panel_editprofile">
                     <EditProfile settings={SettingsD[PlayerId]} player={PlayerD[PlayerId]} />
-                </div>
-                
-            </div>
+                </div>  
+            </div>   
         </section>
     )
 }
