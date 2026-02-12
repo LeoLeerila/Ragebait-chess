@@ -28,11 +28,10 @@ function UserPanel(PlayerId){
     const [StatsD, setStats] = useState(RawStats);
 
 
-    /*
     useEffect(()=>{
         //fetch logic here
     },[])
-    */
+
 
 
     
