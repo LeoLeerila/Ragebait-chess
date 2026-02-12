@@ -8,6 +8,15 @@
     background-color: var(--light-colour);
 }
 
+.landing-title {
+    font-size: 400%;
+}
+
+.landing-text {
+    font-size: 200%;
+    padding-bottom: 1rem;
+}
+
 .landing-buttons {
     display: flex;
     flex-direction: column;
