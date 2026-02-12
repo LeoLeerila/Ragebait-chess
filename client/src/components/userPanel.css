@@ -1,0 +1,33 @@
+.user_panel_inner {
+  border: 15px solid green;
+  padding: 20px;
+  margin: 20px;
+}
+.user_panel_statistic{
+  border: 15px solid green;
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+#user_panel_statistic_header{
+  text-align: center;
+}
+.user_panel_side_txt{
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+#sidetxt{
+  display: flex;
+  gap: 20px;
+}
+.user_panel_lower{
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+#profile_txt {
+  display: flex;
+  gap: 20px;
+  }
