@@ -31,7 +31,8 @@ const getAllPlayers = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve players" });
   }
 };
- 
+
+/* 
 // POST /players
 const createPlayer = async (req, res) => {
   try {
@@ -41,6 +42,7 @@ const createPlayer = async (req, res) => {
     res.status(400).json({ message: "Failed to create player", error: error.message });
   }
 };
+ */
 
 // GET /players/:playerId
 const getPlayerById = async (req, res) => {
@@ -109,7 +111,7 @@ const deletePlayer = async (req, res) => {
 module.exports = {
   getAllPlayers,
   getPlayerById,
-  createPlayer,
+  //createPlayer,
   updatePlayer,
   deletePlayer,
 };

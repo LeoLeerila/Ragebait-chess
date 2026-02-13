@@ -84,16 +84,16 @@ const createSavegame = async (req, res) => {
   }
 };
 
-// GET /savegames/:savegameId
+// GET /savegames/:playerId
 const getSavegameById = async (req, res) => {
-  const { savegameId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(savegameId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
   }
 
   try {
-    const savegame = await Savegame.findById(savegameId);
+    const savegame = await Savegame.findById(playerId);
     if (savegame) {
       res.status(200).json(savegame);
     } else {
@@ -104,17 +104,17 @@ const getSavegameById = async (req, res) => {
   }
 };
 
-// PUT /savegames/:savegameId
+// PUT /savegames/:playerId
 const updateSavegame = async (req, res) => {
-  const { savegameId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(savegameId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
   }
 
   try {
     const updatedSavegame = await Savegame.findOneAndReplace(
-      { _id: savegameId },
+      { playerId: playerId },
       { ...req.body },
       { new: true }
     );
@@ -137,7 +137,7 @@ const deleteSavegame = async (req, res) => {
   }
 
   try {
-    const deletedSavegame = await Savegame.findOneAndDelete({ _id: savegameId });
+    const deletedSavegame = await Savegame.findOneAndDelete({ playerId: savegameId });
     if (deletedSavegame) {
       res.status(200).json({ message: "Savegame deleted successfully" });
     } else {
