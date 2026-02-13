@@ -30,3 +30,31 @@ User stories:
 
 [Trello](https://trello.com/b/QYtVZk0y/aishakki).
 Priority tasks like routing are highlighted with red.
+
+-----
+
+# Sprint 2 deliverables
+
+Our backend and frontend code can be found in the following GitHub branches.
+
+[Main](https://github.com/LeoLeerila/Ragebait-chess/tree/main)
+
+[Database](https://github.com/LeoLeerila/Ragebait-chess/tree/DB)
+
+The group presentation and sprint 2 review can be found in the PowerPoint presentation that we presented on Friday 13.2.26.
+
+[Presentation](https://metropoliafi-my.sharepoint.com/:p:/g/personal/remima_metropolia_fi/IQB8WrWFLStiTrSRotYtAWtzAUo-WjVZ5fkm1Nha_5c6Wco?e=rWKgmO)
+
+Daily scrum meetings were held daily on weekdays just like for sprint 1.
+
+Sprint retrospective with the 4Ls format
+
+- Liked: Daily Scrum, Communication, Starting the implementation of the project, Problem solving.
+
+- Learned: Problem solving, Building a react application, Data delivery through routing, Frontend development.
+
+- Lacked: We weren't sure how to answer this one as we felt our delivery for this sprint was not lacking in much.
+
+- Longed for: More time, Endpoint integration between frontend and backend, More course material about frontend routing.
+
+Team contributions are also detailed in the presentation.
