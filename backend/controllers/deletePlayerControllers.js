@@ -21,7 +21,11 @@ const deletePlayer = async (req, res) => {
         //delete player stats
         await Settings.findOneAndDelete({ playerId });
 
-        res.status(201).json({ deletedPlayer });
+        if (deletedPlayer) {
+            res.status(200).json({ message: "Player deleted successfully" });
+        } else {
+            res.status(404).json({ message: "Player not found" });
+        }
     } catch (error) {
         res.status(400).json({ message: "Failed to delete player", error: error.message });
     }
