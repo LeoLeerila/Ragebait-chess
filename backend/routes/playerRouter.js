@@ -5,10 +5,11 @@ const {
   getPlayerById,
   createPlayer,
   updatePlayer,
-  deletePlayer,
+  //deletePlayer,
   // patchPlayer
 } = require("../controllers/playerControllers");
 const newPlayer = require("../controllers/newPlayerController")
+const deletePlayer = require("../controllers/deletePlayerControllers")
 
 /* example input POST api/player/
 {
