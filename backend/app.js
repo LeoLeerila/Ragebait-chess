@@ -28,8 +28,6 @@ app.use("/api/savegame", savegameRouter);
 app.use("/api/settings", settingsRouter);
 app.use("/api/stats", statsRouter);
 
-
-
 app.use(unknownEndpoint);
 
 app.use(errorHandler);
