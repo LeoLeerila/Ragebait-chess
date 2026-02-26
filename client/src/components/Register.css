@@ -53,3 +53,8 @@
 .login-text {
     margin-top:0;
 }
+
+.login-text a {
+    text-decoration: none;
+    color: var(--dark-colour);
+}

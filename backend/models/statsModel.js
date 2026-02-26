@@ -39,31 +39,31 @@ const statsSchema = new Schema({
   },
   totalMatches: {
     type: Number,
-    required: true,
+    default: 0,
   },
   wonMatches: {
     type: Number,
-    required: true,
+    default: 0,
   },
   stalemateMatches: {
     type: Number,
-    required: true,
+    default: 0,
   },
   aiForfeit: {
     type: Number,
-    required: true,
+    default: 0,
   },
   currentELO: {
     type: Number,
-    required: true,
+    default: 0,
   },
   highestELO: {
     type: Number,
-    required: true,
+    default: 0,
   },
   checkmatePiece: {
     type: String,
-    required: true,
+    default: "",
   },
 }, { timestamps: true });
 

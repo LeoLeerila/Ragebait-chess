@@ -1,12 +1,22 @@
+h2 {
+  margin: 2px;
+  color: var(--dark-colour);
+  font-size: 20px;
+}
+p {
+  color: var(--dark-colour);
+  margin: 2px;
+}
 .user_panel_inner {
-  border: 15px solid green;
-  padding: 20px;
-  margin: 20px;
+  border: 5px solid var(--powder-blue);
+  padding: 10px;
+  margin: 10px;
 }
 .user_panel_statistic{
-  border: 15px solid green;
+  border: 5px solid var(--powder-blue);
   padding: 20px;
   margin: 10px;
+  font-size: 15px;
   text-align: center;
   white-space: nowrap;
 }
@@ -26,9 +36,35 @@
   display: flex;
   gap: 20px;
   justify-content: center;
+  width: 100%;
 }
 #profile_txt {
   display: flex;
+  align-items: center;
   gap: 20px;
-  }
-
+}
+#profile_txt img {
+  height: 4rem;
+  width: 4rem;
+}
+.btn_open_edit, .btn_submit {
+  padding: 10px;
+  background-color: var(--powder-blue);
+  border: none;
+  color: var(--dark-colour);
+  font-size: 15px;
+  cursor: pointer;
+}
+.Buttons {
+  display: flex;
+  justify-content: space-around;
+}
+a.user_panel_link {
+  text-decoration: none;
+  color: var(--dark-colour);
+}
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

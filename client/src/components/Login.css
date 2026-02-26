@@ -46,3 +46,7 @@
 .register-text {
     margin-top:0;
 }
+.register-text a {
+    text-decoration: none;
+    color: var(--dark-colour);
+}
