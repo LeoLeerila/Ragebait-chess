@@ -4,6 +4,9 @@
     --silver-colour: #BCB8B1;
     --light-colour: #F4F3EE;
     --powder-blue: #9FC5E0;
+
+    --selected-dark: #3d4158;
+    --selected-light: #8d8f9d;
 }
 
 /* CHESS BOARD */
@@ -46,6 +49,15 @@
     justify-content: center;
 }
 
+/* Highlight the selected chess tiles */
+.square.light.selected {
+    background-color: var(--selected-light) !important;
+}
+.square.dark.selected {
+    background-color: var(--selected-dark) !important;
+}
+
+/* non-highlighted chess tiles */
 .square.light {
     background-color: var(--silver-colour);
 }
