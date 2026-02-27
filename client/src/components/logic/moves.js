@@ -13,16 +13,72 @@ function isEnemy(piece, target) {
     return isWhite(piece) !== isWhite(target);
 }
 
-// ---- Piece movements
+//My best work so far -R
+function reusableMove(board, row, col, directions) {
+    const piece = board[row][col];
+    const moves = [];
 
-function getPawnMoves(board, row, col) {
-    //check move legalities here
-    console.log("getting pawn moves for: ", row, col)
-    return [];
+    //loop through all possible movements
+    //dc = horizontal movement, dr = vertical movement
+    for(let [dr, dc] of directions) {
+        let r = row + dr;
+        let c = col + dc;
+
+        //while still inside the board and movement limits
+        while (isInside(r,c)) {
+            const target = board[r][c];
+            //- if theres nothing on tiles, add and go again
+            if(!target) {
+                moves.push({row: r, col: c})
+            } else {
+                //if there is enemy, stop
+                if(isEnemy(piece, target)) {
+                    moves.push({row: r, col: c})
+                }
+                //and break out of loop
+                break;
+            }
+            //Move once in the same direction
+            r += dr;
+            c += dc;
+        }
+    }
+    return moves;
 }
-function getRookMoves(board, row, col) {
-    console.log("getting rook moves for: ", row, col)
-    return [];
+
+// ---- Piece movements
+//check move legalities here
+function getPawnMoves(board, row, col) {
+    console.log("getting pawn moves for: ", row, col)
+    const piece = board[row][col];
+    const moves = [];
+    //Determine direction and starting point based on whether or not piece is white
+    const direction = isWhite(piece) ? -1 : 1;
+    const startRow = isWhite(piece) ? 6 : 1;
+    const step = row + direction;
+                            //allows them to move past the startRows
+    if(isInside(step, col) && !board[step][col]) {
+        moves.push({row: step, col});
+        const step2 = row + 2 * direction;
+        //if we are at starting point, allow movement twice
+        if(row === startRow) {
+            moves.push({row: step2, col})
+        }
+    }
+
+    //then also check for diagonal opponents
+    for (let dc of [-1, 1]) {
+        const r = row + direction;
+        const c = col + dc;
+        const target = board[r][c];
+
+        if(!isInside(r, c)) continue;
+        if(target && isEnemy(piece, target)){
+            moves.push({row: r, col: c})
+        }
+    }
+
+    return moves;
 }
 function getKnightMoves(board, row, col) {
     console.log("getting knight moves for: ", row, col)
@@ -49,13 +105,24 @@ function getKnightMoves(board, row, col) {
     }
     return moves;
 }
+function getRookMoves(board, row, col) {
+    console.log("getting rook moves for: ", row, col)
+    return reusableMove(board, row, col, [
+        [1, 0], [0, -1], [-1, 0], [0, 1]
+    ]);
+}
 function getBishopMoves(board, row, col) {
     console.log("getting bishop moves for: ", row, col)
-    return [];
+    return reusableMove(board, row, col, [
+        [1,1], [1,-1], [-1,1], [-1,-1]
+    ]);
 }
 function getQueenMoves(board, row, col) {
     console.log("getting queen moves for: ", row, col)
-    return [];
+    return reusableMove(board, row, col, [
+        [1,1], [1,-1], [-1,1], [-1,-1],
+        [1, 0], [0, -1], [-1, 0], [0, 1]
+    ]);
 }
 function getKingMoves(board, row, col) {
     console.log("getting king moves for: ", row, col)
