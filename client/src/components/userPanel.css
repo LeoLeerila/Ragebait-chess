@@ -7,13 +7,20 @@ p {
   color: var(--dark-colour);
   margin: 2px;
 }
+
+.profile_pic {
+  border-radius :50%;
+}
+
 .user_panel_inner {
-  border: 5px solid var(--powder-blue);
+  border: 5px solid #D9D9D9;
+  background-color:#D9D9D9;
   padding: 10px;
   margin: 10px;
 }
 .user_panel_statistic{
   border: 5px solid var(--powder-blue);
+  background-color: var(--powder-blue);
   padding: 20px;
   margin: 10px;
   font-size: 15px;
