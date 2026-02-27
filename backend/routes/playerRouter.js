@@ -8,6 +8,7 @@ const {
   deletePlayer,
   // patchPlayer
 } = require("../controllers/playerControllers");
+const newPlayer = require("../controllers/newPlayerController")
 
 /* example input POST api/player/
 {
@@ -34,7 +35,7 @@ const {
 router.get("/", getAllPlayers);
 
 // POST /players
-router.post("/", createPlayer); // Create new player
+router.post("/", newPlayer); //router.post("/", createPlayer); // Create new player
 
 // GET /players/:playerId
 router.get("/:playerId", getPlayerById);

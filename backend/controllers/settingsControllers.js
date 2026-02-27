@@ -6,7 +6,8 @@ const mongoose = require("mongoose");
     "playerId": "698af30d0aa1dd526943bd8a",
     "boardStyle": "GoldenCommon",
     "theme": false,
-    "profilePic": "path/to/pfp.png"
+    "profilePic": "path/to/pfp.png",
+    "showProfileStats": "{ShowElo: true, ShowWL: true, ShowDate: true}"
 }
 */
 
@@ -16,6 +17,7 @@ const mongoose = require("mongoose");
     "boardStyle": "GoldenCommon",
     "theme": false,
     "profilePic": "path/to/pfp.png",
+    "showProfileStats": "{ShowElo: true, ShowWL: true, ShowDate: true}",
     "_id": "698b24f05fdbb8c493af9612",
     "createdAt": "2026-02-10T12:30:40.042Z",
     "updatedAt": "2026-02-10T12:30:40.042Z",
@@ -32,7 +34,8 @@ const getAllSettingss = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve settingss" });
   }
 };
- 
+
+/* 
 // POST /settingss
 const createSettings = async (req, res) => {
   try {
@@ -42,17 +45,18 @@ const createSettings = async (req, res) => {
     res.status(400).json({ message: "Failed to create settings", error: error.message });
   }
 };
+ */
 
-// GET /settingss/:settingsId
+// GET /settingss/:playerId
 const getSettingsById = async (req, res) => {
-  const { settingsId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(settingsId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
   }
 
   try {
-    const settings = await Settings.findById(settingsId);
+    const settings = await Settings.findOne({playerId});
     if (settings) {
       res.status(200).json(settings);
     } else {
@@ -63,17 +67,17 @@ const getSettingsById = async (req, res) => {
   }
 };
 
-// PUT /settingss/:settingsId
+// PUT /settingss/:playerId
 const updateSettings = async (req, res) => {
-  const { settingsId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(settingsId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
   }
 
   try {
     const updatedSettings = await Settings.findOneAndReplace(
-      { _id: settingsId },
+      { playerId: playerId },
       { ...req.body },
       { new: true }
     );
@@ -87,16 +91,16 @@ const updateSettings = async (req, res) => {
   }
 };
 
-// DELETE /settingss/:settingsId
+// DELETE /settingss/:playerId
 const deleteSettings = async (req, res) => {
-  const { settingsId } = req.params;
+  const { playerId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(settingsId)) {
+  if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
   }
 
   try {
-    const deletedSettings = await Settings.findOneAndDelete({ _id: settingsId });
+    const deletedSettings = await Settings.findOneAndDelete({ playerId: playerId });
     if (deletedSettings) {
       res.status(200).json({ message: "Settings deleted successfully" });
     } else {
@@ -110,7 +114,7 @@ const deleteSettings = async (req, res) => {
 module.exports = {
   getAllSettingss,
   getSettingsById,
-  createSettings,
+  //createSettings,
   updateSettings,
   deleteSettings,
 };
