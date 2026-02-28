@@ -5,6 +5,7 @@ import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
 import { getMoves, makeMove } from './logic/moves';
 import GameOver from './gameOver';
+import ChatTxt from "./gameChat";
 
 //these are dummydata for use before database
 import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
@@ -24,6 +25,11 @@ const Game = () => {
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
+
+    //Goodbye chat
+    //Chat states
+    const [chatH, setChatH] = useState([]);
+    const [chatP, setChatP] = useState("");
     
     //semi temporary, needs to be changed after db
     const [PlayerD, setPlayer] = useState(RawPlayerData);
@@ -95,6 +101,20 @@ const Game = () => {
         setMethod("resignation");
     }
 
+
+    const onSubmitChat = (e) =>{
+        e.preventDefault();
+        //temp or not, not sure yet
+        const newChat ={
+            ctxt:chatP,
+            isbot:false
+        };
+        //do here the uhh the that uhh thing ... the bot
+        setChatH([...chatH,newChat])
+        setChatP("")
+        console.log(chatH)
+    };
+
     return (
         <div className="game-base">
             {/* GAME BOARD AND DISCARDED PIECES */}
@@ -130,20 +150,16 @@ const Game = () => {
                         </div>
                     </div>
 
-                    {/* Map chat history, *TEMPORARY CODE* */}
+                    {/* Map chat history, *TEMPORARY CODE* (permament) */}
                     <div className="chat-window">
-                        <div className="message opponent">
-                            <div className="bubble"><p>This is my evil reign!</p></div>
-                        </div>
-
-                        <div className="message user">
-                            <div className="bubble" ><p>Bro chill out.</p></div>
-                        </div>
+                        {chatH.map((chat, i) => <ChatTxt key={i} chat={chat}/>)}
                     </div>
 
                     <div className="chat-input">
-                        <input type="text" />
-                        <button className="send-button">&#11127;</button>
+                        <form onSubmit={onSubmitChat}>
+                            <input type="text" value={chatP} onChange={((e)=>setChatP(e.target.value))} />
+                            <button className="send-button">&#11127;</button>
+                        </form>
                     </div>
 
                     {/* Bottom player, map the user data*/}
