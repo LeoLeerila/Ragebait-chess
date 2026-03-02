@@ -150,13 +150,16 @@ const updateSavegame = async (req, res) => {
 // DELETE /savegames/:savegameId
 const deleteSavegame = async (req, res) => {
   const { savegameId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(savegameId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
   }
 
   try {
-    const deletedSavegame = await Savegame.findOneAndDelete({ _id: savegameId });
+    const deletedSavegame = await Savegame.findOneAndDelete({ _id: savegameId, playerId: playerId });
     if (deletedSavegame) {
       res.status(200).json({ message: "Savegame deleted successfully" });
     } else {
