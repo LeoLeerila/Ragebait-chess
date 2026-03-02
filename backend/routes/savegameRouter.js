@@ -8,6 +8,9 @@ const {
   deleteSavegame,
   // patchSavegame
 } = require("../controllers/savegameControllers");
+const requireAuth = require("../middleware/requireAuth");
+
+router.use(requireAuth);
 
 /* example boardState as fen
 starting positions
@@ -82,7 +85,7 @@ router.post("/", createSavegame); // Create new SaveGame
 router.get("/:savegameId", getSavegameById);
 
 // PUT /savegames/:savegameId
-router.put("/:savegameId", updateSavegame);
+router.patch("/:savegameId", updateSavegame);
 
 // DELETE /savegames/:savegameId
 router.delete("/:savegameId", deleteSavegame);
