@@ -1,15 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getAllPlayers,
-  getPlayerById,
-  createPlayer,
-  updatePlayer,
-  //deletePlayer,
-  // patchPlayer
+    signup,
+    login,
+    //getAllPlayers,
+    //getPlayerById,
+    //createPlayer,
+    updatePlayer,
+    deletePlayer,
+    // patchPlayer
 } = require("../controllers/playerControllers");
-const newPlayer = require("../controllers/newPlayerController")
-const deletePlayer = require("../controllers/deletePlayerControllers")
+//const deletePlayer = require("../controllers/deletePlayerControllers")
+const requireAuth = require("../middleware/requireAuth");
 
 /* example input POST api/player/
 {
@@ -31,21 +33,26 @@ const deletePlayer = require("../controllers/deletePlayerControllers")
 }
  */
 
- 
+
 // GET /players
-router.get("/", getAllPlayers);
+//router.get("/", getAllPlayers);
 
 // POST /players
-router.post("/", newPlayer); //router.post("/", createPlayer); // Create new player
+router.post("/signup", signup); //router.post("/", createPlayer); // Create new player
+
+// POST /players
+router.post("/login", login)
 
 // GET /players/:playerId
-router.get("/:playerId", getPlayerById);
+//router.get("/:playerId", getPlayerById);
+
+router.use(requireAuth);
 
 // PUT /players/:playerId
-router.put("/:playerId", updatePlayer);
+router.put("/", updatePlayer);
 
 // DELETE /players/:playerId
-router.delete("/:playerId", deletePlayer);
+router.delete("/", deletePlayer);
 
 // Update player using PATCH 
 // router.patch('/:playerId', patchPlayer)
