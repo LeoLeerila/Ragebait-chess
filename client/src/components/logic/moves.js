@@ -5,11 +5,11 @@ function isInside(row, col) {
 }
 
 //make sure white pieces are uppercased, and also so that isEnemy can compare piece to target
-function isWhite(piece){
+function isWhite(piece) {
     return piece === piece?.toUpperCase();
 }
 function isEnemy(piece, target) {
-    if(!target) return false;
+    if (!target) return false;
     return isWhite(piece) !== isWhite(target);
 }
 
@@ -20,20 +20,20 @@ function reusableMove(board, row, col, directions) {
 
     //loop through all possible movements
     //dc = horizontal movement, dr = vertical movement
-    for(let [dr, dc] of directions) {
+    for (let [dr, dc] of directions) {
         let r = row + dr;
         let c = col + dc;
 
         //while still inside the board and movement limits
-        while (isInside(r,c)) {
+        while (isInside(r, c)) {
             const target = board[r][c];
             //- if theres nothing on tiles, add and go again
-            if(!target) {
-                moves.push({row: r, col: c})
+            if (!target) {
+                moves.push({ row: r, col: c })
             } else {
                 //if there is enemy, stop
-                if(isEnemy(piece, target)) {
-                    moves.push({row: r, col: c})
+                if (isEnemy(piece, target)) {
+                    moves.push({ row: r, col: c })
                 }
                 //and break out of loop
                 break;
@@ -46,6 +46,8 @@ function reusableMove(board, row, col, directions) {
     return moves;
 }
 
+
+
 // ---- Piece movements
 //check move legalities here
 function getPawnMoves(board, row, col) {
@@ -56,13 +58,13 @@ function getPawnMoves(board, row, col) {
     const direction = isWhite(piece) ? -1 : 1;
     const startRow = isWhite(piece) ? 6 : 1;
     const step = row + direction;
-                            //allows them to move past the startRows
-    if(isInside(step, col) && !board[step][col]) {
-        moves.push({row: step, col});
+    //allows them to move past the startRows
+    if (isInside(step, col) && !board[step][col]) {
+        moves.push({ row: step, col });
         const step2 = row + 2 * direction;
         //if we are at starting point, allow movement twice
-        if(row === startRow) {
-            moves.push({row: step2, col})
+        if (row === startRow) {
+            moves.push({ row: step2, col })
         }
     }
 
@@ -72,9 +74,9 @@ function getPawnMoves(board, row, col) {
         const c = col + dc;
         const target = board[r][c];
 
-        if(!isInside(r, c)) continue;
-        if(target && isEnemy(piece, target)){
-            moves.push({row: r, col: c})
+        if (!isInside(r, c)) continue;
+        if (target && isEnemy(piece, target)) {
+            moves.push({ row: r, col: c })
         }
     }
 
@@ -86,21 +88,21 @@ function getKnightMoves(board, row, col) {
     const moves = [];
     //All 8 L-shaped movements for knight
     const offsets = [
-        [-2,-1], [-2,1], [-1,-2], [-1,2],
+        [-2, -1], [-2, 1], [-1, -2], [-1, 2],
         [1, -2], [1, 2], [2, -1], [2, 1]
     ]
-    
+
     //loop through all possible movements
     //dc = horizontal movement, dr = vertical movement
-    for (let [dr, dc] of offsets){
+    for (let [dr, dc] of offsets) {
         const r = row + dr;
         const c = col + dc;
 
-        if(!isInside(r, c)) continue;
+        if (!isInside(r, c)) continue;
         const target = board[r][c];
         //allows tiles that are empty or have an enemy piece and ignores friendly pieces
-        if(!target || isEnemy(piece, target)){
-            moves.push({row: r, col: c})
+        if (!target || isEnemy(piece, target)) {
+            moves.push({ row: r, col: c })
         }
     }
     return moves;
@@ -114,27 +116,46 @@ function getRookMoves(board, row, col) {
 function getBishopMoves(board, row, col) {
     console.log("getting bishop moves for: ", row, col)
     return reusableMove(board, row, col, [
-        [1,1], [1,-1], [-1,1], [-1,-1]
+        [1, 1], [1, -1], [-1, 1], [-1, -1]
     ]);
 }
 function getQueenMoves(board, row, col) {
     console.log("getting queen moves for: ", row, col)
     return reusableMove(board, row, col, [
-        [1,1], [1,-1], [-1,1], [-1,-1],
+        [1, 1], [1, -1], [-1, 1], [-1, -1],
         [1, 0], [0, -1], [-1, 0], [0, 1]
     ]);
 }
 function getKingMoves(board, row, col) {
     console.log("getting king moves for: ", row, col)
-    return [];
+    const piece = board[row][col];
+    const moves = [];
+
+    const offsets = [
+        [0, 1], [1, 0], [1, 1], [1, -1],
+        [-1, 1], [-1, 0], [0, -1], [-1, -1],
+    ]
+
+    for (let [dr, dc] of offsets) {
+        const r = row + dr;
+        const c = col + dc;
+
+        if (!isInside(r, c)) continue;
+        const target = board[r][c];
+        if (!target || isEnemy(piece, target)) {
+            moves.push({ row: r, col: c })
+        }
+    }
+
+    return moves;
 }
 
 // make the check for legal moves
 export function getMoves(board, row, col) {
     const piece = board[row][col];
-    if(!piece) return [];
+    if (!piece) return [];
     //create a switch check. If piece matches the letter, it returns the logic for that piece. If not, it returns an empty array.
-    switch(piece.toLowerCase()) {
+    switch (piece.toLowerCase()) {
         case 'p': return getPawnMoves(board, row, col);
         case 'r': return getRookMoves(board, row, col);
         case 'n': return getKnightMoves(board, row, col);
