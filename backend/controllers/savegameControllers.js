@@ -1,5 +1,13 @@
 const Savegame = require('../models/savegameModel');
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+
+
+const decodeToken = (authorization) => {
+  const token = authorization.split(" ")[1];
+  const { _id } = jwt.verify(token, process.env.SECRET);
+  return _id
+}
 
 /* example boardState as fen
 starting positions
@@ -42,7 +50,6 @@ note castling ->  white(player) can castle [K]ing and [Q]ueen side
 
 /* example input POST api/savegame/
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
     "boardState": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     "moveHistory": "[f2f4 e7e6, e2e3 f7f5, g2g4 f5g4]",
     "board": "GoldenCommon",
@@ -52,22 +59,26 @@ note castling ->  white(player) can castle [K]ing and [Q]ueen side
 
 /* example output POST api/savegame/
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
+    "playerId": "69a546bb46aa4543c800d2ce",
     "boardState": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     "moveHistory": "[f2f4 e7e6, e2e3 f7f5, g2g4 f5g4]",
     "board": "GoldenCommon",
     "chatHistory": "['I am Evil Larry and you are no match for me!', 'have you tried being good larry', 'As a large language model instructed to be Evil Larry I cannot comly.', 'dam']",
-    "_id": "698b22b3682d4c428f8fe586",
-    "createdAt": "2026-02-10T12:21:07.949Z",
-    "updatedAt": "2026-02-10T12:21:07.949Z",
+    "_id": "69a54adb94c1e837fa4b1931",
+    "createdAt": "2026-03-02T08:31:23.879Z",
+    "updatedAt": "2026-03-02T08:31:23.879Z",
     "__v": 0
 }
 */
 
 // GET /savegames
 const getAllSavegames = async (req, res) => {
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
+
   try {
-    const savegames = await Savegame.find({}).sort({ createdAt: -1 });
+    const savegames = await Savegame.find({playerId}).sort({ createdAt: -1 });
     res.status(200).json(savegames);
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve savegames" });
@@ -76,24 +87,28 @@ const getAllSavegames = async (req, res) => {
  
 // POST /savegames
 const createSavegame = async (req, res) => {
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
+
   try {
-    const newSavegame = await Savegame.create({ ...req.body });
+    const newSavegame = await Savegame.create({ playerId: playerId, ...req.body });
     res.status(201).json(newSavegame);
   } catch (error) {
     res.status(400).json({ message: "Failed to create savegame", error: error.message });
   }
 };
 
-// GET /savegames/:playerId
+// GET /savegames/:savegameId
 const getSavegameById = async (req, res) => {
-  const { playerId } = req.params;
+  const { savegameId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(playerId)) {
+  if (!mongoose.Types.ObjectId.isValid(savegameId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
   }
 
   try {
-    const savegame = await Savegame.findById(playerId);
+    const savegame = await Savegame.findById(savegameId);
     if (savegame) {
       res.status(200).json(savegame);
     } else {
@@ -104,17 +119,20 @@ const getSavegameById = async (req, res) => {
   }
 };
 
-// PUT /savegames/:playerId
+// PUT /savegames/:savegameId
 const updateSavegame = async (req, res) => {
-  const { playerId } = req.params;
+  const { savegameId } = req.params;
+  const { authorization } = req.headers;
 
-  if (!mongoose.Types.ObjectId.isValid(playerId)) {
+  const playerId = decodeToken(authorization)
+
+  if (!mongoose.Types.ObjectId.isValid(savegameId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
   }
 
   try {
-    const updatedSavegame = await Savegame.findOneAndReplace(
-      { playerId: playerId },
+    const updatedSavegame = await Savegame.findOneAndUpdate(
+      { playerId: playerId, _id: savegameId },
       { ...req.body },
       { new: true }
     );
@@ -131,13 +149,16 @@ const updateSavegame = async (req, res) => {
 // DELETE /savegames/:savegameId
 const deleteSavegame = async (req, res) => {
   const { savegameId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(savegameId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
   }
 
   try {
-    const deletedSavegame = await Savegame.findOneAndDelete({ playerId: savegameId });
+    const deletedSavegame = await Savegame.findOneAndDelete({ _id: savegameId, playerId: playerId });
     if (deletedSavegame) {
       res.status(200).json({ message: "Savegame deleted successfully" });
     } else {

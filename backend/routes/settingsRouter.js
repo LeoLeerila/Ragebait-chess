@@ -8,45 +8,73 @@ const {
   deleteSettings,
   // patchSettings
 } = require("../controllers/settingsControllers");
+const requireAuth = require("../middleware/requireAuth");
 
-/* example input POST api/settings/
+router.use(requireAuth);
+
+/* default settings
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
+    "showProfileStats": {
+        "ShowElo": true,
+        "ShowWL": true,
+        "ShowDate": true
+    },
+    "_id": "69a54c8c83b53fa25e594136",
+    "playerId": "69a54c8c83b53fa25e594132",
     "boardStyle": "GoldenCommon",
-    "theme": false,
+    "theme": true,
     "profilePic": "path/to/pfp.png",
-    "showProfileStats": "{ShowElo: true, ShowWL: true, ShowDate: true}"
+    "createdAt": "2026-03-02T08:38:36.688Z",
+    "updatedAt": "2026-03-02T08:38:36.688Z",
+    "__v": 0
+}
+ */
+
+/* example input PATCH api/settings/update
+{
+    "showProfileStats": {
+        "ShowElo": false,
+        "ShowWL": false,
+        "ShowDate": false
+    },
+    "boardStyle": "Epic",
+    "theme": true,
+    "profilePic": "path/to/pfp.png"
 }
 */
 
-/* example output POST api/settings/
+/* example output PATCH api/settings/update
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
-    "boardStyle": "GoldenCommon",
-    "theme": false,
+    "showProfileStats": {
+        "ShowElo": false,
+        "ShowWL": false,
+        "ShowDate": false
+    },
+    "_id": "69a54c8c83b53fa25e594136",
+    "playerId": "69a54c8c83b53fa25e594132",
+    "boardStyle": "Epic",
+    "theme": true,
     "profilePic": "path/to/pfp.png",
-    "showProfileStats": "{ShowElo: true, ShowWL: true, ShowDate: true}",
-    "_id": "698b24f05fdbb8c493af9612",
-    "createdAt": "2026-02-10T12:30:40.042Z",
-    "updatedAt": "2026-02-10T12:30:40.042Z",
+    "createdAt": "2026-03-02T08:38:36.688Z",
+    "updatedAt": "2026-03-02T08:41:02.527Z",
     "__v": 0
 }
 */
  
 // GET /settingss
-router.get("/", getAllSettingss);
+//router.get("/", getAllSettingss);
 
 // POST /settingss
 //router.post("/", createSettings); // Create new player Settings (run only once)
 
-// GET /settingss/:playerId
-router.get("/:playerId", getSettingsById);
+// GET /settings/
+router.get("/", getSettingsById);
 
-// PUT /settingss/:playerId
-router.put("/:playerId", updateSettings);
+// PUT /settings/
+router.patch("/update", updateSettings);
 
 // DELETE /settingss/:playerId
-router.delete("/:playerId", deleteSettings);
+//router.delete("/:playerId", deleteSettings);
 
 // Update settings using PATCH 
 // router.patch('/:settingsId', patchSettings)

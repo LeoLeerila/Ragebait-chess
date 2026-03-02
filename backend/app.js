@@ -11,10 +11,14 @@ const {requestLogger,unknownEndpoint,errorHandler} = require("./middleware/custo
 // express app
 const app = express();
 
+const dotenv = require('dotenv');
+
 connectDB();
  
 // middleware
 app.use(express.json());
+
+dotenv.config();
 
 app.use(requestLogger);
 
