@@ -1,36 +1,59 @@
 const Stats = require('../models/statsModel');
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
-/* example input POST api/stats/
+
+const decodeToken = (authorization) => {
+  const token = authorization.split(" ")[1];
+  const { _id } = jwt.verify(token, process.env.SECRET);
+  return _id
+}
+
+/* default stats
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
-    "totalMatches": 9001,
-    "wonMatches": 1,
+    "_id": "69a54c8c83b53fa25e594134",
+    "playerId": "69a54c8c83b53fa25e594132",
+    "totalMatches": 0,
+    "wonMatches": 0,
     "stalemateMatches": 0,
     "aiForfeit": 0,
+    "currentELO": 0,
+    "highestELO": 0,
+    "checkmatePiece": "",
+    "createdAt": "2026-03-02T08:38:36.687Z",
+    "updatedAt": "2026-03-02T08:38:36.687Z",
+    "__v": 0
+}
+ */
+
+/* example input PATCH api/stats/update
+{
+    "totalMatches": 9001,
+    "wonMatches": 1,
     "currentELO": 1,
-    "highestELO": 2,
+    "highestELO": 1,
     "checkmatePiece": "King"
 }
 */
 
-/* example output POST api/stats/
+/* example output PATCH api/stats/update
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
+    "_id": "69a546bb46aa4543c800d2d0",
+    "playerId": "69a546bb46aa4543c800d2ce",
     "totalMatches": 9001,
     "wonMatches": 1,
     "stalemateMatches": 0,
     "aiForfeit": 0,
     "currentELO": 1,
-    "highestELO": 2,
+    "highestELO": 1,
     "checkmatePiece": "King",
-    "_id": "698b26199e2678dc32942244",
-    "createdAt": "2026-02-10T12:35:37.383Z",
-    "updatedAt": "2026-02-10T12:35:37.383Z",
+    "createdAt": "2026-03-02T08:13:47.597Z",
+    "updatedAt": "2026-03-02T08:14:36.545Z",
     "__v": 0
 }
 */
 
+/* 
 // GET /statss
 const getAllStats = async (req, res) => {
   try {
@@ -40,6 +63,7 @@ const getAllStats = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve statss" });
   }
 };
+ */
 
 /* 
 // POST /statss
@@ -55,7 +79,9 @@ const createStats = async (req, res) => {
 
 // GET /statss/:playerId
 const getStatsById = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
@@ -75,14 +101,16 @@ const getStatsById = async (req, res) => {
 
 // PUT /statss/:playerId
 const updateStats = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
   }
 
   try {
-    const updatedStats = await Stats.findOneAndReplace(
+    const updatedStats = await Stats.findOneAndUpdate(
       { playerId: playerId },
       { ...req.body },
       { new: true }
@@ -97,6 +125,7 @@ const updateStats = async (req, res) => {
   }
 };
 
+/* 
 // DELETE /statss/:playerId
 const deleteStats = async (req, res) => {
   const { playerId } = req.params;
@@ -116,12 +145,13 @@ const deleteStats = async (req, res) => {
     res.status(500).json({ message: "Failed to delete stats" });
   }
 };
+ */
 
 module.exports = {
-  getAllStats,
+  //getAllStats,
   getStatsById,
   //createStats,
   updateStats,
-  deleteStats,
+  //deleteStats,
 };
 

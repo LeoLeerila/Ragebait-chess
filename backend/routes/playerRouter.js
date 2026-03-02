@@ -1,50 +1,53 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getAllPlayers,
-  getPlayerById,
-  createPlayer,
-  updatePlayer,
-  deletePlayer,
-  // patchPlayer
+    signup,
+    login,
+    //getAllPlayers,
+    //getPlayerById,
+    //createPlayer,
+    updatePlayer,
+    deletePlayer,
+    // patchPlayer
 } = require("../controllers/playerControllers");
-const newPlayer = require("../controllers/newPlayerController")
+//const deletePlayer = require("../controllers/deletePlayerControllers")
+const requireAuth = require("../middleware/requireAuth");
 
-/* example input POST api/player/
+/* example input POST api/signup/
 {
     "playerName": "Kaiffari",
-    "password": "securepassword",
+    "password": "Xf1&8opq",
     "email": "kaiffari@kaiffaritOY.fi"
 }
  */
 
-/* example output POST api/player/
+/* example output POST api/signup/
 {
-    "playerName": "Kaiffari",
-    "password": "securepassword",
     "email": "kaiffari@kaiffaritOY.fi",
-    "_id": "698af30d0aa1dd526943bd8a",
-    "createdAt": "2026-02-10T08:57:49.680Z",
-    "updatedAt": "2026-02-10T08:57:49.680Z",
-    "__v": 0
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE1NGM4YzgzYjUzZmEyNWU1OTQxMzIiLCJpYXQiOjE3NzI0NDA3MTYsImV4cCI6MTc3MjY5OTkxNn0.5hxihhjFfyHuURLT5UPXIRxtALyFPQZwWe6EkF24YPg"
 }
  */
 
- 
-// GET /players
-router.get("/", getAllPlayers);
 
-// POST /players
-router.post("/", newPlayer); //router.post("/", createPlayer); // Create new player
+// GET /players
+//router.get("/", getAllPlayers);
+
+// POST /signup
+router.post("/signup", signup); //router.post("/", createPlayer); // Create new player
+
+// POST /login
+router.post("/login", login)
 
 // GET /players/:playerId
-router.get("/:playerId", getPlayerById);
+//router.get("/:playerId", getPlayerById);
+
+router.use(requireAuth);
 
 // PUT /players/:playerId
-router.put("/:playerId", updatePlayer);
+router.put("/", updatePlayer);
 
 // DELETE /players/:playerId
-router.delete("/:playerId", deletePlayer);
+router.delete("/", deletePlayer);
 
 // Update player using PATCH 
 // router.patch('/:playerId', patchPlayer)
