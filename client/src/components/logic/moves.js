@@ -1,10 +1,10 @@
-// ---- Rulesets and reusables
+// ---- RULESETS!!!! and reusables
 function isInside(row, col) {
     //inside the board limits 8x8
     return row >= 0 && row < 8 && col >= 0 && col < 8;
 }
 
-//make sure white pieces are uppercased, and also so that isEnemy can compare piece to target
+//isEnemy (and other funcs) can compare piece to target OR in plainer terms: returns boolean
 function isWhite(piece) {
     return piece === piece?.toUpperCase();
 }
@@ -46,12 +46,49 @@ function reusableMove(board, row, col, directions) {
     return moves;
 }
 
+//this functions only purpose is to get coordinates of the king in a reusable manner
+function getKing(board, colour) {
+    const king = colour === "white" ? "K" : "k";
+    //locate the mf
+    for(let row = 0; row < 8; row++) {
+        for(let col= 0; col < 8; col++) {
+            if(board[row][col] === king) {
+                //return the location of the king
+                return {row, col}
+            }
+        }
+    }
+    return null;
+}
+
+function isInCheck(board, colour){
+    const kingPos = getKing(board, colour); //return coords of our king
+    
+    for(let row = 0; row < 8; row++){
+        for(let col= 0; col < 8; col++){
+            const piece = board[row][col];
+            if (!piece) continue;
+            //skip friendly pieces
+            if ((colour === "white" && isWhite(piece)) || (colour === "black" && !isWhite(piece))){
+                continue;
+            }
+            //get potential enemy moves (getMoves() in getMoves()? Sounds fun.)
+            const enemyMoves = pseudoMoves(board, row, col);
+            //if some of them can move to the kings spot during their turn
+            if(enemyMoves.some(move => move.row === kingPos.row && move.col === kingPos.col)) {
+                return true;
+            }
+        }
+    }
+
+    return false; 
+}
 
 
 // ---- Piece movements
 //check move legalities here
 function getPawnMoves(board, row, col) {
-    console.log("getting pawn moves for: ", row, col)
+    //console.log("getting pawn moves for: ", row, col)
     const piece = board[row][col];
     const moves = [];
     //Determine direction and starting point based on whether or not piece is white
@@ -83,7 +120,7 @@ function getPawnMoves(board, row, col) {
     return moves;
 }
 function getKnightMoves(board, row, col) {
-    console.log("getting knight moves for: ", row, col)
+    //console.log("getting knight moves for: ", row, col)
     const piece = board[row][col];
     const moves = [];
     //All 8 L-shaped movements for knight
@@ -108,26 +145,26 @@ function getKnightMoves(board, row, col) {
     return moves;
 }
 function getRookMoves(board, row, col) {
-    console.log("getting rook moves for: ", row, col)
+    //console.log("getting rook moves for: ", row, col)
     return reusableMove(board, row, col, [
         [1, 0], [0, -1], [-1, 0], [0, 1]
     ]);
 }
 function getBishopMoves(board, row, col) {
-    console.log("getting bishop moves for: ", row, col)
+    //console.log("getting bishop moves for: ", row, col)
     return reusableMove(board, row, col, [
         [1, 1], [1, -1], [-1, 1], [-1, -1]
     ]);
 }
 function getQueenMoves(board, row, col) {
-    console.log("getting queen moves for: ", row, col)
+    //console.log("getting queen moves for: ", row, col)
     return reusableMove(board, row, col, [
         [1, 1], [1, -1], [-1, 1], [-1, -1],
         [1, 0], [0, -1], [-1, 0], [0, 1]
     ]);
 }
 function getKingMoves(board, row, col) {
-    console.log("getting king moves for: ", row, col)
+    //console.log("getting king moves for: ", row, col)
     const piece = board[row][col];
     const moves = [];
 
@@ -149,21 +186,36 @@ function getKingMoves(board, row, col) {
 
     return moves;
 }
-
+//turned into a function so that getMoves() and isInCheck() can use it
+//ainii ja älkää tehkö tätä virhettä: mä yritin kutsua getMoves() (koska tämä kyseinen switch case) ton isInCheck() sisällä... vaikka isInCheck() on getMoves() sisällä.....
+//... not my brightest moment.
+function pseudoMoves(board, row, col) {
+    const piece = board[row][col];
+    if (!piece) return [];
+        switch (piece.toLowerCase()) {
+            case 'p': return getPawnMoves(board, row, col);
+            case 'r': return getRookMoves(board, row, col);
+            case 'n': return getKnightMoves(board, row, col);
+            case 'b': return getBishopMoves(board, row, col);
+            case 'q': return getQueenMoves(board, row, col);
+            case 'k': return getKingMoves(board, row, col);
+            default: return [];
+        }
+    }
 // make the check for legal moves
 export function getMoves(board, row, col) {
     const piece = board[row][col];
     if (!piece) return [];
-    //create a switch check. If piece matches the letter, it returns the logic for that piece. If not, it returns an empty array.
-    switch (piece.toLowerCase()) {
-        case 'p': return getPawnMoves(board, row, col);
-        case 'r': return getRookMoves(board, row, col);
-        case 'n': return getKnightMoves(board, row, col);
-        case 'b': return getBishopMoves(board, row, col);
-        case 'q': return getQueenMoves(board, row, col);
-        case 'k': return getKingMoves(board, row, col);
-        default: return [];
-    }
+    
+    const colour = piece === piece.toUpperCase() ? "white" : "black";
+    const moves = pseudoMoves(board, row, col);
+    //now HERE we take out the moves that put the king in risk
+    const legalMoves = moves.filter(move => {
+        const simulation = makeMove(board, {row, col}, move);
+        return !isInCheck(simulation, colour)
+    });
+    
+    return legalMoves;
 }
 
 export function makeMove(board, fromSpot, to) {
