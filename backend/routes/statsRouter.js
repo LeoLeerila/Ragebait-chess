@@ -8,6 +8,9 @@ const {
   deleteStats,
   // patchStats
 } = require("../controllers/statsControllers");
+const requireAuth = require("../middleware/requireAuth");
+
+router.use(requireAuth);
 
 /* example input POST api/stats/
 {
@@ -40,19 +43,19 @@ const {
 */
  
 // GET /stats
-router.get("/", getAllStats);
+//router.get("/", getAllStats);
 
 // POST /stats
 //router.post("/", createStats); // Create new player Stats (run only once)
 
 // GET /stats/:playerId
-router.get("/:playerId", getStatsById);
+router.get("/", getStatsById);
 
 // PUT /stats/:playerId
-router.put("/:playerId", updateStats);
+router.patch("/update", updateStats);
 
 // DELETE /stats/:playerId
-router.delete("/:playerId", deleteStats);
+//router.delete("/:playerId", deleteStats);
 
 // Update stats using PATCH 
 // router.patch('/:statsId', patchStats)

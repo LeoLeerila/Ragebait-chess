@@ -1,5 +1,13 @@
 const Stats = require('../models/statsModel');
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+
+
+const decodeToken = (authorization) => {
+  const token = authorization.split(" ")[1];
+  const { _id } = jwt.verify(token, process.env.SECRET);
+  return _id
+}
 
 /* example input POST api/stats/
 {
@@ -31,6 +39,7 @@ const mongoose = require("mongoose");
 }
 */
 
+/* 
 // GET /statss
 const getAllStats = async (req, res) => {
   try {
@@ -40,6 +49,7 @@ const getAllStats = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve statss" });
   }
 };
+ */
 
 /* 
 // POST /statss
@@ -55,7 +65,9 @@ const createStats = async (req, res) => {
 
 // GET /statss/:playerId
 const getStatsById = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
@@ -75,14 +87,16 @@ const getStatsById = async (req, res) => {
 
 // PUT /statss/:playerId
 const updateStats = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
   }
 
   try {
-    const updatedStats = await Stats.findOneAndReplace(
+    const updatedStats = await Stats.findOneAndUpdate(
       { playerId: playerId },
       { ...req.body },
       { new: true }
@@ -97,6 +111,7 @@ const updateStats = async (req, res) => {
   }
 };
 
+/* 
 // DELETE /statss/:playerId
 const deleteStats = async (req, res) => {
   const { playerId } = req.params;
@@ -116,12 +131,13 @@ const deleteStats = async (req, res) => {
     res.status(500).json({ message: "Failed to delete stats" });
   }
 };
+ */
 
 module.exports = {
-  getAllStats,
+  //getAllStats,
   getStatsById,
   //createStats,
   updateStats,
-  deleteStats,
+  //deleteStats,
 };
 
