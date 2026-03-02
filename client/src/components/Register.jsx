@@ -27,7 +27,6 @@ function RegisterForm() {
         return;
         }
         console.log("Submission succesful:", form);
-        //the following fetch request is not functional yet.
         const response = await fetch("/api/player/signup", {
             method: "POST",
             headers: {
