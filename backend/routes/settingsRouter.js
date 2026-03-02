@@ -8,6 +8,9 @@ const {
   deleteSettings,
   // patchSettings
 } = require("../controllers/settingsControllers");
+const requireAuth = require("../middleware/requireAuth");
+
+router.use(requireAuth);
 
 /* example input POST api/settings/
 {
@@ -34,19 +37,19 @@ const {
 */
  
 // GET /settingss
-router.get("/", getAllSettingss);
+//router.get("/", getAllSettingss);
 
 // POST /settingss
 //router.post("/", createSettings); // Create new player Settings (run only once)
 
-// GET /settingss/:playerId
-router.get("/:playerId", getSettingsById);
+// GET /settings/
+router.get("/", getSettingsById);
 
-// PUT /settingss/:playerId
-router.put("/:playerId", updateSettings);
+// PUT /settings/
+router.patch("/update", updateSettings);
 
 // DELETE /settingss/:playerId
-router.delete("/:playerId", deleteSettings);
+//router.delete("/:playerId", deleteSettings);
 
 // Update settings using PATCH 
 // router.patch('/:settingsId', patchSettings)

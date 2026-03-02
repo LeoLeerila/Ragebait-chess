@@ -1,5 +1,13 @@
 const Settings = require('../models/settingsModel');
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+
+
+const decodeToken = (authorization) => {
+  const token = authorization.split(" ")[1];
+  const { _id } = jwt.verify(token, process.env.SECRET);
+  return _id
+}
 
 /* example input POST api/settings/
 {
@@ -25,6 +33,7 @@ const mongoose = require("mongoose");
 }
 */
 
+/* 
 // GET /settingss
 const getAllSettingss = async (req, res) => {
   try {
@@ -34,6 +43,7 @@ const getAllSettingss = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve settingss" });
   }
 };
+ */
 
 /* 
 // POST /settingss
@@ -47,9 +57,11 @@ const createSettings = async (req, res) => {
 };
  */
 
-// GET /settingss/:playerId
+// GET /settings/
 const getSettingsById = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
@@ -67,16 +79,18 @@ const getSettingsById = async (req, res) => {
   }
 };
 
-// PUT /settingss/:playerId
+// PUT /settings/update
 const updateSettings = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
   }
 
   try {
-    const updatedSettings = await Settings.findOneAndReplace(
+    const updatedSettings = await Settings.findOneAndUpdate(
       { playerId: playerId },
       { ...req.body },
       { new: true }
@@ -91,6 +105,7 @@ const updateSettings = async (req, res) => {
   }
 };
 
+/* 
 // DELETE /settingss/:playerId
 const deleteSettings = async (req, res) => {
   const { playerId } = req.params;
@@ -110,12 +125,13 @@ const deleteSettings = async (req, res) => {
     res.status(500).json({ message: "Failed to delete settings" });
   }
 };
+ */
 
 module.exports = {
-  getAllSettingss,
+  //getAllSettingss,
   getSettingsById,
   //createSettings,
   updateSettings,
-  deleteSettings,
+  //deleteSettings,
 };
 
