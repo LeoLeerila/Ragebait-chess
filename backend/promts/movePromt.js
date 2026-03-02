@@ -1,13 +1,13 @@
 const model = require("../config/gemini.js");
 
 
-// params: fen, currentMoves, history, blockedPieces
-async function generateMove(txt){
+// params: fen, currentMoves, history, blockedPieces, playerAns
+async function generateMove(playerAns){
     // HERE THE PROMPT
     //const prompt = ``
 
     //this for testing purpose
-    const prompt = txt
+    const prompt = playerAns
 
     try {
     const result = await model(prompt);

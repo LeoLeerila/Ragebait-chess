@@ -6,6 +6,7 @@ const savegameRouter = require('./routes/savegameRouter');
 const settingsRouter = require('./routes/settingsRouter');
 const statsRouter = require("./routes/statsRouter");
 const aiRouter = require("./routes/aiRouter");
+const cors = require('cors');
 
 const {requestLogger,unknownEndpoint,errorHandler} = require("./middleware/customMiddleware");
   
@@ -18,7 +19,7 @@ connectDB();
  
 // middleware
 app.use(express.json());
-
+app.use(cors());
 dotenv.config();
 
 app.use(requestLogger);

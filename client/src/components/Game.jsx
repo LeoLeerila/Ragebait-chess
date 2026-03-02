@@ -28,7 +28,7 @@ const Game = () => {
 
     //Goodbye chat
     //Chat states
-    const [chatH, setChatH] = useState([]);
+    const [chatH, setChatH] = useState([{ctxt:"Greetings type to type here or something like that", isbot:true}]);
     const [chatP, setChatP] = useState("");
     
     //semi temporary, needs to be changed after db
@@ -102,17 +102,65 @@ const Game = () => {
     }
 
 
-    const onSubmitChat = (e) =>{
-        e.preventDefault();
-        //temp or not, not sure yet
-        const newChat ={
-            ctxt:chatP,
-            isbot:false
-        };
-        //do here the uhh the that uhh thing ... the bot
-        setChatH([...chatH,newChat])
-        setChatP("")
+    async function handelChatUpd(txt, isbot) {
         console.log(chatH)
+        setChatH((chatH)=> { return [...chatH,{ctxt:txt,isbot:isbot}]})
+    };
+
+    //this is for the chat
+    const onSubmitChat = async (e) =>{
+        e.preventDefault();
+
+        await handelChatUpd(chatP, false);
+        
+        console.log(chatH)
+
+        //do here the uhh the that uhh thing ... the bot
+
+        //going to be something like this
+        /*
+        const newData = {
+            fen:,
+            currentMoves:,
+            history:,
+            blockedPieces:,
+            playerAns:,
+        };
+        */
+
+        //temp
+        const newData = {
+            playerAns:chatP,
+            history:chatH
+        };
+        console.log(JSON.stringify(newData))
+        setChatP("")
+        
+        try {
+
+            const res = await fetch('http://localhost:4000/api/ai/generate-nxt-move', {
+            method: "POST",
+            body: JSON.stringify(newData),
+            headers:{
+                'Content-Type': 'application/json',
+                },
+            });
+            console.log(res)
+            
+            const data = await res.json();
+            if(!res.ok){
+                console.log("Failed in bot", data, res.body, newData)
+                return
+            }
+            await handelChatUpd(data.data, true);
+
+            
+            
+        } catch (error) {
+            console.log("Error in speaking with bot:", error);
+        }
+        
+
     };
 
     return (
