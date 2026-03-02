@@ -13,23 +13,18 @@ const {
 //const deletePlayer = require("../controllers/deletePlayerControllers")
 const requireAuth = require("../middleware/requireAuth");
 
-/* example input POST api/player/
+/* example input POST api/signup/
 {
     "playerName": "Kaiffari",
-    "password": "securepassword",
+    "password": "Xf1&8opq",
     "email": "kaiffari@kaiffaritOY.fi"
 }
  */
 
-/* example output POST api/player/
+/* example output POST api/signup/
 {
-    "playerName": "Kaiffari",
-    "password": "securepassword",
     "email": "kaiffari@kaiffaritOY.fi",
-    "_id": "698af30d0aa1dd526943bd8a",
-    "createdAt": "2026-02-10T08:57:49.680Z",
-    "updatedAt": "2026-02-10T08:57:49.680Z",
-    "__v": 0
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWE1NGM4YzgzYjUzZmEyNWU1OTQxMzIiLCJpYXQiOjE3NzI0NDA3MTYsImV4cCI6MTc3MjY5OTkxNn0.5hxihhjFfyHuURLT5UPXIRxtALyFPQZwWe6EkF24YPg"
 }
  */
 
@@ -37,10 +32,10 @@ const requireAuth = require("../middleware/requireAuth");
 // GET /players
 //router.get("/", getAllPlayers);
 
-// POST /players
+// POST /signup
 router.post("/signup", signup); //router.post("/", createPlayer); // Create new player
 
-// POST /players
+// POST /login
 router.post("/login", login)
 
 // GET /players/:playerId

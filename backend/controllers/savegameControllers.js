@@ -50,7 +50,6 @@ note castling ->  white(player) can castle [K]ing and [Q]ueen side
 
 /* example input POST api/savegame/
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
     "boardState": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     "moveHistory": "[f2f4 e7e6, e2e3 f7f5, g2g4 f5g4]",
     "board": "GoldenCommon",
@@ -60,14 +59,14 @@ note castling ->  white(player) can castle [K]ing and [Q]ueen side
 
 /* example output POST api/savegame/
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
+    "playerId": "69a546bb46aa4543c800d2ce",
     "boardState": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     "moveHistory": "[f2f4 e7e6, e2e3 f7f5, g2g4 f5g4]",
     "board": "GoldenCommon",
     "chatHistory": "['I am Evil Larry and you are no match for me!', 'have you tried being good larry', 'As a large language model instructed to be Evil Larry I cannot comly.', 'dam']",
-    "_id": "698b22b3682d4c428f8fe586",
-    "createdAt": "2026-02-10T12:21:07.949Z",
-    "updatedAt": "2026-02-10T12:21:07.949Z",
+    "_id": "69a54adb94c1e837fa4b1931",
+    "createdAt": "2026-03-02T08:31:23.879Z",
+    "updatedAt": "2026-03-02T08:31:23.879Z",
     "__v": 0
 }
 */
