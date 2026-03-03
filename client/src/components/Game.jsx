@@ -1,5 +1,5 @@
 import './Game.css'
-import { React, useState } from 'react'
+import { React, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
@@ -148,10 +148,9 @@ const Game = () => {
             playerAns:chatP,
             history:chatH
         };
-        console.log(JSON.stringify(newData))
-        setChatP("")
         
-        try {
+        setChatP("")
+         try {
 
             const res = await fetch('http://localhost:4000/api/ai/generate-nxt-move', {
             method: "POST",
@@ -174,6 +173,7 @@ const Game = () => {
         } catch (error) {
             console.log("Error in speaking with bot:", error);
         }
+        
         
 
     };
