@@ -85,7 +85,7 @@ function UserPanel(){
         <section className="user_panel" id="user_panel">
             <div className="user_panel_inner" id="user_panel_profile">
                 <div id="profile_txt">
-                    <img src={SettingsD[t_PlayerId].ProfilePic} alt="profilepic"/>
+                    <img className="profile_pic" src={SettingsD[t_PlayerId].ProfilePic} alt="profilepic"/>
                     <p>{PlayerD[t_PlayerId].Name}</p>
                     {ShowElo ? <p>Current ELO: {StatsD[t_PlayerId].CurrentELO}</p>:<p/>}
                     {ShowWL ?<p>Won: {StatsD[t_PlayerId].WonMatches} Played: {StatsD[t_PlayerId].TotalMatches}</p>:<p/>}

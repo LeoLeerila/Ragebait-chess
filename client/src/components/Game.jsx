@@ -9,7 +9,7 @@ import ChatTxt from "./gameChat";
 
 //these are dummydata for use before database
 import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
-import { algToCoords } from './logic/helps';
+import { algToCoords, coordsToAlg, boardToFen } from './logic/helps';
 
 const Game = () => {
     //useLocation: get the shit from gameStart.jsx through 'state'
@@ -35,7 +35,7 @@ const Game = () => {
     const [PlayerD, setPlayer] = useState(RawPlayerData);
     const [SettingsD, setSettings] = useState(RawSettings);
     const [StatsD, setStats] = useState(RawStats);
-
+    console.log(boardToFen(board, turn))
     //this is temporary, when database is working it will use different method
     let PlayerId = "4" //temp to change player in chatbox
     let t_PlayerId = ""
@@ -57,7 +57,7 @@ const Game = () => {
     //CODE DUMP ALERT: GAME MECHANICS YIPPEE
     function handleSquareClick(square) {
         //convert ts back to numerical coords so the code can handle it
-        const {row, col} = algToCoords(square);
+        const { row, col } = algToCoords(square);
         const piece = board[row][col];
         console.log("clicked on " + square + " which has piece: " + piece);
 
@@ -70,7 +70,13 @@ const Game = () => {
             //something like "if piece colour equal to player colour -> then do shit."
             if ((turn === "white" && isWhite) || (turn === "black" && !isWhite)) {
                 setSelected({ row, col });
-                console.log(getMoves(board, row, col));
+                const highlight = getMoves(board, row, col);
+                Object.values(highlight).forEach(coord => {
+                    const toAlg = coordsToAlg(coord.row, coord.col);
+                    //console.log(coord, "->", toAlg);
+                    const elem = document.getElementById(toAlg);
+                    elem.classList.add('available');
+                });
             }
             return;
         }
@@ -78,6 +84,10 @@ const Game = () => {
         if (selected.row === row && selected.col === col) {
             console.log("Unselected!")
             setSelected(null);
+            const avElement = document.querySelectorAll('.available');
+            avElement.forEach(elem => {
+                elem.classList.remove('available');
+            })
             return;
         }
         //getMoves returns the result of one of get_Moves in moves.js
@@ -85,12 +95,17 @@ const Game = () => {
         const isLegal = legalMoves.some(
             move => move.row === row && move.col === col
         );
+
         if (isLegal) {
             const newBoard = makeMove(board, selected, { row, col });
             setboard(newBoard);
             setTurn(turn === "white" ? "black" : "white");
         }
         setSelected(null);
+        const avElement = document.querySelectorAll('.available');
+        avElement.forEach(elem => {
+            elem.classList.remove('available');
+        })
     }
 
 

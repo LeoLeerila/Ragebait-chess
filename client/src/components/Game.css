@@ -50,10 +50,10 @@
 }
 
 /* Highlight the selected chess tiles */
-.square.light.selected {
+.square.light.selected, .square.light.available {
     background-color: var(--selected-light) !important;
 }
-.square.dark.selected {
+.square.dark.selected, .square.dark.available {
     background-color: var(--selected-dark) !important;
 }
 
