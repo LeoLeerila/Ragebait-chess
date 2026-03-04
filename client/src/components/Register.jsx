@@ -43,6 +43,7 @@ function RegisterForm() {
             console.error("Error registering player:", data);
             return;
         }
+        localStorage.setItem("user", JSON.stringify(user));
         console.log("Response from backend:", data);
     }
 

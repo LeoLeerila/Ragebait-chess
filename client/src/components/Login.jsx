@@ -14,12 +14,27 @@ function LoginForm() {
         setForm({...form, [event.target.name]: event.target.value});
     }
     //handles form submission
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         //prevent page reloading upon submission
         event.preventDefault();
-        //for now this just console logs a succesful log in attempt and shows the values submitted
         console.log("Login succesful:", form);
-        //this is probably where the logic for sending the login request to the backend would go, once it's time for that
+        const response = await fetch("api/player/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: form.email,
+                password: form.password
+            })
+        })
+        const user = await response.json();
+        if (!response.ok) {
+            console.error("Error logging in:", user);
+            return;
+        }
+        localStorage.setItem("user", JSON.stringify(user));
+        console.log("Response from backend:", user);
     }
 
 //html section
