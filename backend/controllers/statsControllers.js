@@ -3,12 +3,6 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
 
-const decodeToken = (authorization) => {
-  const token = authorization.split(" ")[1];
-  const { _id } = jwt.verify(token, process.env.SECRET);
-  return _id
-}
-
 /* default stats
 {
     "_id": "69a54c8c83b53fa25e594134",
@@ -79,9 +73,7 @@ const createStats = async (req, res) => {
 
 // GET /statss/:playerId
 const getStatsById = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
@@ -101,9 +93,7 @@ const getStatsById = async (req, res) => {
 
 // PUT /statss/:playerId
 const updateStats = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid stats ID" });
