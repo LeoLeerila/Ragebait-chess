@@ -3,12 +3,6 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
 
-const decodeToken = (authorization) => {
-  const token = authorization.split(" ")[1];
-  const { _id } = jwt.verify(token, process.env.SECRET);
-  return _id
-}
-
 /* default settings
 {
     "showProfileStats": {
@@ -84,9 +78,7 @@ const createSettings = async (req, res) => {
 
 // GET /settings/
 const getSettingsById = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
@@ -106,9 +98,7 @@ const getSettingsById = async (req, res) => {
 
 // PUT /settings/update
 const updateSettings = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });

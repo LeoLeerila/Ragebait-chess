@@ -26,12 +26,6 @@ const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
 
-const decodeToken = (authorization) => {
-  const token = authorization.split(" ")[1];
-  const { _id } = jwt.verify(token, process.env.SECRET);
-  return _id
-}
-
 // login a player
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -147,9 +141,7 @@ const createPlayer = async (req, res) => {
 
 // PUT /players/:playerId
 const updatePlayer = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid player ID" });
@@ -217,10 +209,7 @@ const updatePlayer = async (req, res) => {
 
 // DEL /player
 const deletePlayer = async (req, res) => {
-
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid player ID" });
