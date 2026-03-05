@@ -120,7 +120,6 @@ const Game = () => {
 
 
     async function handelChatUpd(txt, isbot) {
-        console.log(chatH)
         setChatH((chatH) => { return [...chatH, { ctxt: txt, isbot: isbot }] })
     };
 
@@ -128,26 +127,26 @@ const Game = () => {
     const onSubmitChat = async (e) => {
         e.preventDefault();
 
-        await handelChatUpd(chatP, false);
+        await handelChatUpd(chatP, false);  // chat became liiitle bit more complicated
 
         //do here the uhh the that uhh thing ... the bot
 
-        //going to be something like this
-        /*
-        const newData = {
-            fen:,
-            currentMoves:,
-            history:,
-            blockedPieces:,
-            playerAns:,
-        };
-        */
-        //temp
         setChatP("")
-        
+
+        // next return data should be
+
+        //temp data for testing purposes, there should be also aipreset (name & all of the stuff)
         const data = await fetchData('/ai/generate-nxt-move',"POST",token,{
+            botBoard:{
+                fen:boardToFen(board, turn),
+                currenMoves:[],
+                blocked:[],
+                history:chatH,
+                botChessC:"BLACK",
+                botElo:"1200"
+            },
+            botPreset:{}, 
             playerAns:chatP,
-            history:chatH
         })
 
         await handelChatUpd(data.data, true);

@@ -5,9 +5,9 @@ async function generateMoveText(req,res) {
     //whole body of this funtion is made for test purposes, will be made right later
 
     try{
-        const {playerAns, history} = req.body;
+        const {playerAns, botBoard} = req.body;
 
-        const rawRes = await generateMove(playerAns)
+        const rawRes = await generateMove(playerAns, botBoard)
 
         const jsonMatch = rawRes.match(/```json\s*([\s\S]*?)\s*```/);
         const jsonString = jsonMatch ? jsonMatch[1] : rawRes;

@@ -28,7 +28,6 @@ function UserPanel() {
 
     useEffect(() => {
         const fetchStuff = async () => {
-
             const playerData = await fetchData('/player/',"GET",token)
             const statsData = await fetchData('/stats/',"GET",token)
             const settingsData = await fetchData('/settings/',"GET",token)
@@ -42,21 +41,18 @@ function UserPanel() {
 
             setName(playerData.playerName)
             setEmail(playerData.email)
-            console.log(error)
 
         }
         fetchStuff()
-    }, [])
+    }, [openEdit])
 
     const onSubmit = async (e) => {
         e.preventDefault()
 
-        /*
         await fetchData("/player","PATCH",token,{
             playerName:Name,
             email:EMail
         })
-        */
 
         await fetchData("/settings/update","PATCH",token,{showProfileStats:{
             ShowElo:ShowElo,
