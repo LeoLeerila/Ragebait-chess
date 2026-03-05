@@ -4,7 +4,7 @@ const {
     signup,
     login,
     //getAllPlayers,
-    //getPlayerById,
+    getPlayerById,
     //createPlayer,
     updatePlayer,
     deletePlayer,
@@ -38,10 +38,10 @@ router.post("/signup", signup); //router.post("/", createPlayer); // Create new 
 // POST /login
 router.post("/login", login)
 
-// GET /players/:playerId
-//router.get("/:playerId", getPlayerById);
-
 router.use(requireAuth);
+
+// GET /players/:playerId
+router.get("/", getPlayerById);
 
 // PUT /players/:playerId
 router.put("/", updatePlayer);
