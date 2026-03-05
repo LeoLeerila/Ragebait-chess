@@ -40,13 +40,13 @@ router.post("/login", login)
 
 router.use(requireAuth);
 
-// GET /players/:playerId
+// GET /players/
 router.get("/", getPlayerById);
 
-// PUT /players/:playerId
-router.put("/", updatePlayer);
+// PUT /players/
+router.patch("/", updatePlayer);
 
-// DELETE /players/:playerId
+// DELETE /players/
 router.delete("/", deletePlayer);
 
 // Update player using PATCH 

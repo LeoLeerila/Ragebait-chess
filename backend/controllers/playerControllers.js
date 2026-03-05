@@ -130,7 +130,7 @@ const getPlayerById = async (req, res) => {
   try {
     const player = await Player.findById(playerId);
     if (player) {
-      res.status(200).json({playerName: player.playerName, email: player.email});
+      res.status(200).json({ playerName: player.playerName, email: player.email });
     } else {
       res.status(404).json({ message: "Player not found" });
     }
@@ -139,7 +139,7 @@ const getPlayerById = async (req, res) => {
   }
 };
 
-// PUT /players/:playerId
+// PATCH /players/:playerId
 const updatePlayer = async (req, res) => {
   const playerId = req.user._id;
 
@@ -164,12 +164,12 @@ const updatePlayer = async (req, res) => {
         throw Error("Email not valid");
       }
       const exists = await Player.findOne({ email });
-      if (exists) {
+      if (exists && !exists._id.equals(req.user._id)) {
         throw Error("Email already in use");
       }
     }
 
-    const updatedPlayer = await Player.findOneAndReplace(
+    const updatedPlayer = await Player.findOneAndUpdate(
       { _id: playerId },
       { ...req.body },
       { new: true }
@@ -177,7 +177,7 @@ const updatePlayer = async (req, res) => {
     if (updatedPlayer) {
       // create a token
       const token = createToken(updatedPlayer._id);
-      res.status(200).json(updatedPlayer.playerName);
+      res.status(200).json({ playerName: updatedPlayer.playerName, email: updatedPlayer.email, token });
     } else {
       res.status(404).json({ message: "Player not found" });
     }
