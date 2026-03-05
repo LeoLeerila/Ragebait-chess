@@ -13,6 +13,9 @@ function useFetchBetter(url) {
     // this is already has /api , with second url you add other part for example /player/
     const fetchData = async (id, method="GET", token=null, body=null) => {
         const urlid = url + id
+        if(body !== null){
+            body = JSON.stringify(body)
+        }
         try {
             const response = await fetch(urlid, {
                 method:method,
