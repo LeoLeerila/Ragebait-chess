@@ -1,30 +1,64 @@
 const Settings = require('../models/settingsModel');
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 
-/* example input POST api/settings/
+
+const decodeToken = (authorization) => {
+  const token = authorization.split(" ")[1];
+  const { _id } = jwt.verify(token, process.env.SECRET);
+  return _id
+}
+
+/* default settings
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
+    "showProfileStats": {
+        "ShowElo": true,
+        "ShowWL": true,
+        "ShowDate": true
+    },
+    "_id": "69a54c8c83b53fa25e594136",
+    "playerId": "69a54c8c83b53fa25e594132",
     "boardStyle": "GoldenCommon",
-    "theme": false,
+    "theme": true,
     "profilePic": "path/to/pfp.png",
-    "showProfileStats": "{ShowElo: true, ShowWL: true, ShowDate: true}"
+    "createdAt": "2026-03-02T08:38:36.688Z",
+    "updatedAt": "2026-03-02T08:38:36.688Z",
+    "__v": 0
+}
+ */
+
+/* example input PATCH api/settings/update
+{
+    "showProfileStats": {
+        "ShowElo": false,
+        "ShowWL": false,
+        "ShowDate": false
+    },
+    "boardStyle": "Epic",
+    "theme": true,
+    "profilePic": "path/to/pfp.png"
 }
 */
 
-/* example output POST api/settings/
+/* example output PATCH api/settings/update
 {
-    "playerId": "698af30d0aa1dd526943bd8a",
-    "boardStyle": "GoldenCommon",
-    "theme": false,
+    "showProfileStats": {
+        "ShowElo": false,
+        "ShowWL": false,
+        "ShowDate": false
+    },
+    "_id": "69a54c8c83b53fa25e594136",
+    "playerId": "69a54c8c83b53fa25e594132",
+    "boardStyle": "Epic",
+    "theme": true,
     "profilePic": "path/to/pfp.png",
-    "showProfileStats": "{ShowElo: true, ShowWL: true, ShowDate: true}",
-    "_id": "698b24f05fdbb8c493af9612",
-    "createdAt": "2026-02-10T12:30:40.042Z",
-    "updatedAt": "2026-02-10T12:30:40.042Z",
+    "createdAt": "2026-03-02T08:38:36.688Z",
+    "updatedAt": "2026-03-02T08:41:02.527Z",
     "__v": 0
 }
 */
 
+/* 
 // GET /settingss
 const getAllSettingss = async (req, res) => {
   try {
@@ -34,6 +68,7 @@ const getAllSettingss = async (req, res) => {
     res.status(500).json({ message: "Failed to retrieve settingss" });
   }
 };
+ */
 
 /* 
 // POST /settingss
@@ -47,9 +82,11 @@ const createSettings = async (req, res) => {
 };
  */
 
-// GET /settingss/:playerId
+// GET /settings/
 const getSettingsById = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
@@ -67,16 +104,18 @@ const getSettingsById = async (req, res) => {
   }
 };
 
-// PUT /settingss/:playerId
+// PUT /settings/update
 const updateSettings = async (req, res) => {
-  const { playerId } = req.params;
+  const { authorization } = req.headers;
+
+  const playerId = decodeToken(authorization)
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid settings ID" });
   }
 
   try {
-    const updatedSettings = await Settings.findOneAndReplace(
+    const updatedSettings = await Settings.findOneAndUpdate(
       { playerId: playerId },
       { ...req.body },
       { new: true }
@@ -91,6 +130,7 @@ const updateSettings = async (req, res) => {
   }
 };
 
+/* 
 // DELETE /settingss/:playerId
 const deleteSettings = async (req, res) => {
   const { playerId } = req.params;
@@ -110,12 +150,13 @@ const deleteSettings = async (req, res) => {
     res.status(500).json({ message: "Failed to delete settings" });
   }
 };
+ */
 
 module.exports = {
-  getAllSettingss,
+  //getAllSettingss,
   getSettingsById,
   //createSettings,
   updateSettings,
-  deleteSettings,
+  //deleteSettings,
 };
 

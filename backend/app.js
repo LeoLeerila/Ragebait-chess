@@ -22,6 +22,8 @@ app.use(express.json());
 app.use(cors());
 dotenv.config();
 
+dotenv.config();
+
 app.use(requestLogger);
 
 app.get("/", (req, res) => res.send("API Running!"));
