@@ -8,15 +8,15 @@ function useFetchBetter(url) {
     const [isLoading, setIsLoading] = useState(false);
 
     // do this for example: const playerData = await fetchData('/player/'+PlayerId)
-    // GET is default if nothing added, body is also null by default
-    // fetchData(url, method, body)
+    // GET is default if nothing added, body is also null by default and token is null by default
+    // fetchData(url, method, token, body)
     // this is already has /api , with second url you add other part for example /player/
-    const fetchData = async (id, method="GET", body=null) => {
+    const fetchData = async (id, method="GET", token=null, body=null) => {
         const urlid = url + id
         try {
             const response = await fetch(urlid, {
                 method:method,
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                 body:body,
             });
             const data = await response.json();

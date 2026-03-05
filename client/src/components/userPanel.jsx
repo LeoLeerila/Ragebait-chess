@@ -6,14 +6,14 @@ import "./userPanel.css";
 
 
 
-function UserPanel(){
-    const {PlayerId} = useParams(); 
+function UserPanel() {
+    const { PlayerId } = useParams();
 
     const [playerD, setPlayerD] = useState({});
     const [settingsD, setSettingsD] = useState({});
     const [statsD, setStatsD] = useState({});
 
-    const {fetchData, isLoading, error} = useFetchBetter(`http://localhost:4000/api`)
+    const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`)
 
     const [openEdit, setEdit] = useState(false)
     const [Name, setName] = useState("")
@@ -23,46 +23,57 @@ function UserPanel(){
     const [ShowWL, setShowWL] = useState(Boolean)
     const [ShowDate, setShowDate] = useState(Boolean)
 
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user ? user.token : null;
 
 
-    useEffect(()=>{
-        const fetchStuff = async() => {
 
-        const playerData = await fetchData('/player/'+PlayerId)
-        const statsData = await fetchData('/stats/'+PlayerId)
-        const settingsData = await fetchData('/settings/'+PlayerId)
+    useEffect(() => {
+        const fetchStuff = async () => {
 
-        setPlayerD(playerData);
-        setStatsD(statsData);
-        setSettingsD(settingsData);
-        
+            const playerData = await fetchData('/player/' + PlayerId,"GET",token)
+            const statsData = await fetchData('/stats/' + PlayerId,"GET",token)
+            const settingsData = await fetchData('/settings/' + PlayerId,"GET",token)
+
+            setPlayerD(playerData);
+            setStatsD(statsData);
+            setSettingsD(settingsData);
+            setShowWL(settingsData.showProfileStats.ShowWL)
+            setShowElo(settingsData.showProfileStats.ShowElo)
+            setShowDate(settingsData.showProfileStats.ShowDate)
+
+            setName(playerData.playerName)
+            setEmail(playerData.email)
+
         }
         fetchStuff()
-    },[PlayerId])
+    }, [PlayerId])
 
-
-
-    const onSubmit = async (e) =>{
+    const onSubmit = async (e) => {
         e.preventDefault()
+
+        
+
+
     }
 
-    function editHandle(){
+    function editHandle() {
         setEdit(!openEdit)
     }
 
 
 
-    
-    return(
+
+    return (
         <section className="user_panel" id="user_panel">
             <div className="user_panel_inner" id="user_panel_profile">
                 <div id="profile_txt">
-                    <img className="profile_pic" src={settingsD.profilePic} alt="profilepic"/>
+                    <img className="profile_pic" src={settingsD.profilePic} alt="profilepic" />
                     <p>{playerD.playerName}</p>
-                    {ShowElo ? <p>Current ELO: {statsD.currentELO}</p>:<p/>}
-                    {ShowWL ?<p>Won: {statsD.wonMatches} Played: {statsD.totalMatches}</p>:<p/>}
-                    {ShowDate ?<p>Date of register: {playerD.createdAt}</p>:<p/>}
-                </div> 
+                    {ShowElo ? <p>Current ELO: {statsD.currentELO}</p> : <p />}
+                    {ShowWL ? <p>Won: {statsD.wonMatches} Played: {statsD.totalMatches}</p> : <p />}
+                    {ShowDate ? <p>Date of register: {playerD.createdAt}</p> : <p />}
+                </div>
             </div>
             <div className="user_panel_lower">
                 <div className="user_panel_inner" id="user_panel_stats">
@@ -70,11 +81,11 @@ function UserPanel(){
                         <div className="user_panel_statistic">
                             <h2 id="user_panel_statistic_header">WIN TO LOSE RATIO</h2>
                             <div className="user_panel_side_txt">
-                                <p>Matches won: {statsD.wonMatches}</p> 
+                                <p>Matches won: {statsD.wonMatches}</p>
                                 <p>Ratio:</p>
                             </div>
                             <div className="user_panel_side_txt">
-                                <p>Matches lost : {statsD.totalMatches - statsD.wonMatches -statsD.StalemateMatches}</p>
+                                <p>Matches lost : {statsD.totalMatches - statsD.wonMatches - statsD.StalemateMatches}</p>
                                 <p>{statsD.wonMatches}/{statsD.totalMatches}</p>
                             </div>
                             <div className="user_panel_side_txt">
@@ -105,7 +116,7 @@ function UserPanel(){
                     <div className="userPanel_edit">
                         <div id="sidetxt">
                             <h2>Edit Profile</h2>
-                           <button className="btn_open_edit" onClick={editHandle} >/edit/</button>
+                            <button className="btn_open_edit" onClick={editHandle} >/edit/</button>
                         </div>
                         {openEdit ?
                             <div className="editModal">
@@ -113,42 +124,42 @@ function UserPanel(){
                                     <div className="editModal_content">
                                         <form className="editForm" onSubmit={onSubmit}>
                                             <h2 className="editForm_txt">Edit</h2>
-                                            <input type="text" placeholder="Name" value={Name} onChange={(e) => setName(e.target.value)}/>
-                                            <input type="email" placeholder="Email" value={EMail} onChange={(e) => setEmail(e.target.value)}/>
-                                            <input type="txt" placeholder="Password" value={Password} onChange={(e) => setPassw(e.target.value)}/>
+                                            <input type="text" placeholder="Name" value={Name} onChange={(e) => setName(e.target.value)} />
+                                            <input type="email" placeholder="Email" value={EMail} onChange={(e) => setEmail(e.target.value)} />
+                                            <input type="txt" placeholder="Password" value={Password} onChange={(e) => setPassw(e.target.value)} />
                                             <button className="btn_submit" type="submit" >Submit</button>
                                         </form>
                                     </div>
+                                    <div className="user_panel_side_txt">
+                                        <div>
+                                            <label htmlFor="ShowEloRating">Elo Rating</label>
+                                            <input type="checkbox" id="ShowEloRating" checked={ShowElo} value={ShowElo} onChange={(e) => setShowElo(!ShowElo)}></input>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="ShowWLcount">W/L count</label>
+                                            <input type="checkbox" id="ShowWLcount" checked={ShowWL} value={ShowWL} onChange={(e) => setShowWL(!ShowWL)}></input>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="ShowDate">Register date</label>
+                                            <input type="checkbox" id="ShowDate" checked={ShowDate} value={ShowDate} onChange={(e) => setShowDate(!ShowDate)}></input>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>:null}
+                            </div> : null}
                         <div>
                             <p>Username: {playerD.playerName}</p>
                             <p>Email: {playerD.email}</p>
-                            <p>Password: {playerD.password}</p>
-                            <p>Profile picture:<br/><img src={settingsD.profilePic} alt="profilepic"/></p>
+                            {/*<p>Password: {playerD.password}</p>*/}
+                            <p>Profile picture:<br /><img src={settingsD.profilePic} alt="profilepic" /></p>
                             <p>Display on profile:</p>
-                            <div className="user_panel_side_txt">
-                                <div>
-                                    <label htmlFor="ShowEloRating">Elo Rating</label>
-                                    <input  type="checkbox" id="ShowEloRating" checked={ShowElo} value={ShowElo} onChange={(e) => setShowElo(!ShowElo)}></input>
-                                </div>
-                                <div>
-                                    <label htmlFor="ShowWLcount">W/L count</label>
-                                    <input type="checkbox" id="ShowWLcount" checked={ShowWL} value={ShowWL}onChange={(e) => setShowWL(!ShowWL)}></input>
-                                </div>
-                                <div>
-                                    <label htmlFor="ShowDate">Register date</label>
-                                    <input type="checkbox" id="ShowDate" checked={ShowDate} value={ShowDate}onChange={(e) => setShowDate(!ShowDate)}></input>
-                                </div>
-                            </div>
                         </div>
                         <div className="user_panel_side_txt">
                             <p>Reset profile?</p>
                             <p>Delete profile?</p>
-                        </div>    
+                        </div>
                     </div>
-                </div>  
-            </div>   
+                </div>
+            </div>
         </section>
     )
 }
