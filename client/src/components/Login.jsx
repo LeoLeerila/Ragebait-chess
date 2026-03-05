@@ -1,10 +1,11 @@
 import {useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
 
 //simple login form function made based on Register.jsx
 function LoginForm() {
     //state object
+    const navigate = useNavigate();
     const [form, setForm] = useState({
         email: "",
         password: "",
@@ -17,7 +18,6 @@ function LoginForm() {
     async function handleSubmit(event) {
         //prevent page reloading upon submission
         event.preventDefault();
-        console.log("Login succesful:", form);
         const response = await fetch("api/player/login", {
             method: "POST",
             headers: {
@@ -33,8 +33,10 @@ function LoginForm() {
             console.error("Error logging in:", user);
             return;
         }
+        console.log("Login succesful:", form);
         localStorage.setItem("user", JSON.stringify(user));
         console.log("Response from backend:", user);
+        navigate("/")
     }
 
 //html section
