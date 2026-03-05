@@ -9,7 +9,7 @@ async function generateMove(playerAns, botBoard){
     ### **Schema Requirements**:
     The JSON response should have the following structure:
     {
-      "botMove": "Chess move which you are going to move in FEN format",
+      "botMove": "Chess move which you are going to move",
       "botAnswer": "Comment about the player comment and move"
     }
     ### Player comment to you:
