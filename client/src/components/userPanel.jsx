@@ -7,8 +7,6 @@ import "./userPanel.css";
 
 
 function UserPanel() {
-    const { PlayerId } = useParams();
-
     const [playerD, setPlayerD] = useState({});
     const [settingsD, setSettingsD] = useState({});
     const [statsD, setStatsD] = useState({});
@@ -48,7 +46,7 @@ function UserPanel() {
 
         }
         fetchStuff()
-    }, [PlayerId])
+    }, [])
 
     const onSubmit = async (e) => {
         e.preventDefault()

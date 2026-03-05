@@ -6,12 +6,15 @@ import { initBoard } from '../assets/initBoard';
 import { getMoves, makeMove } from './logic/moves';
 import GameOver from './gameOver';
 import ChatTxt from "./gameChat";
+import useFetchBetter from "./hooks/useFetchBetter";
 
 //these are dummydata for use before database
-import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
 import { algToCoords, coordsToAlg, boardToFen } from './logic/helps';
 
 const Game = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user ? user.token : null;
+
     //useLocation: get the shit from gameStart.jsx through 'state'
     const navigate = useNavigate();
     const location = useLocation();
@@ -28,31 +31,30 @@ const Game = () => {
 
     //Goodbye chat
     //Chat states
-    const [chatH, setChatH] = useState([{ctxt:"Greetings type to type here or something like that", isbot:true}]);
+    const [chatH, setChatH] = useState([{ ctxt: "Greetings type to type here or something like that", isbot: true }]);
     const [chatP, setChatP] = useState("");
+
+    // custom hook to fetch stuff
+    const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`)
+    const [playerD, setPlayerD] = useState({})
+    const [settingsD, setSettingsD] = useState({})
+    const [statsD, setStatsD] = useState({})
+
+    // This load player info
+    useEffect(() => {
+            const fetchStuff = async () => {
+                const playerData = await fetchData('/player/',"GET",token)
+                const statsData = await fetchData('/stats/',"GET",token)
+                const settingsData = await fetchData('/settings/',"GET",token)
     
-    //semi temporary, needs to be changed after db
-    const [PlayerD, setPlayer] = useState(RawPlayerData);
-    const [SettingsD, setSettings] = useState(RawSettings);
-    const [StatsD, setStats] = useState(RawStats);
+                setPlayerD(playerData);
+                setStatsD(statsData);
+                setSettingsD(settingsData);
+            }
+            fetchStuff()
+        }, [])
+
     console.log(boardToFen(board, turn))
-    //this is temporary, when database is working it will use different method
-    let PlayerId = "4" //temp to change player in chatbox
-    let t_PlayerId = ""
-    let pFound = false
-    for (let i = 0; i < RawPlayerData.length;) {
-        if (RawPlayerData[i].PlayerId === PlayerId) {
-            t_PlayerId = i;
-            pFound = true;
-            break
-        } else {
-            i++;
-        }
-    };
-    //it will throw alert when data not found in dummydata file
-    if (!pFound) {
-        alert("player data not found")
-    };
 
     //CODE DUMP ALERT: GAME MECHANICS YIPPEE
     function handleSquareClick(square) {
@@ -119,16 +121,14 @@ const Game = () => {
 
     async function handelChatUpd(txt, isbot) {
         console.log(chatH)
-        setChatH((chatH)=> { return [...chatH,{ctxt:txt,isbot:isbot}]})
+        setChatH((chatH) => { return [...chatH, { ctxt: txt, isbot: isbot }] })
     };
 
     //this is for the chat
-    const onSubmitChat = async (e) =>{
+    const onSubmitChat = async (e) => {
         e.preventDefault();
 
         await handelChatUpd(chatP, false);
-        
-        console.log(chatH)
 
         //do here the uhh the that uhh thing ... the bot
 
@@ -142,41 +142,17 @@ const Game = () => {
             playerAns:,
         };
         */
-
         //temp
-        const newData = {
+        setChatP("")
+        
+        const data = await fetchData('/ai/generate-nxt-move',"POST",token,{
             playerAns:chatP,
             history:chatH
-        };
-        
-        setChatP("")
-         try {
+        })
 
-            const res = await fetch('http://localhost:4000/api/ai/generate-nxt-move', {
-            method: "POST",
-            body: JSON.stringify(newData),
-            headers:{
-                'Content-Type': 'application/json',
-                },
-            });
-            console.log(res)
-            
-            const data = await res.json();
-            if(!res.ok){
-                console.log("Failed in bot", data, res.body, newData)
-                return
-            }
-            await handelChatUpd(data.data, true);
-
-            
-            
-        } catch (error) {
-            console.log("Error in speaking with bot:", error);
-        }
-        
-        
-
+        await handelChatUpd(data.data, true);
     };
+
 
     return (
         <div className="game-base">
@@ -215,12 +191,12 @@ const Game = () => {
 
                     {/* Map chat history, *TEMPORARY CODE* (permament) */}
                     <div className="chat-window">
-                        {chatH.map((chat, i) => <ChatTxt key={i} chat={chat}/>)}
+                        {chatH.map((chat, i) => <ChatTxt key={i} chat={chat} />)}
                     </div>
 
                     <div className="chat-input">
                         <form onSubmit={onSubmitChat}>
-                            <input type="text" value={chatP} onChange={((e)=>setChatP(e.target.value))} />
+                            <input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))} />
                             <button className="send-button">&#11127;</button>
                         </form>
                     </div>
@@ -228,11 +204,11 @@ const Game = () => {
                     {/* Bottom player, map the user data*/}
                     <div className="player-card bottom-player">
                         <div className="avatar">
-                            <img src={SettingsD[t_PlayerId].ProfilePic} />
+                            <img src={settingsD.ProfilePic} />
                         </div>
                         <div className="player-info">
-                            <div className="player-name">{PlayerD[t_PlayerId].Name}</div>
-                            <div className="player-rating">{StatsD[t_PlayerId].CurrentELO} ELO</div>
+                            <div className="player-name">{playerD.playerName}</div>
+                            <div className="player-rating">{statsD.currentELO} ELO</div>
                         </div>
                         <div className="player-icon"></div>
                     </div>

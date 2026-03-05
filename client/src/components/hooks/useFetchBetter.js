@@ -38,5 +38,5 @@ function useFetchBetter(url) {
     };
     return {fetchData, isLoading, error}
 };
-
+// this hook was worth all of the pain
 export default useFetchBetter;
