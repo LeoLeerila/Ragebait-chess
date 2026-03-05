@@ -1,15 +1,18 @@
 import './Game.css'
 import { React, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
-import Chessboard from '../models/chessgame/Chessboard';
-import { initBoard } from '../models/chessgame/initBoard';
+import Chessboard from './Chessboard';
+import { initBoard } from '../assets/initBoard';
+import { getMoves, makeMove } from './logic/moves';
 import GameOver from './gameOver';
 
 //these are dummydata for use before database
 import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
+import { algToCoords, coordsToAlg, boardToFen } from './logic/helps';
 
 const Game = () => {
     //useLocation: get the shit from gameStart.jsx through 'state'
+    const navigate = useNavigate();
     const location = useLocation();
     const { opponent, playerSide, godmode } = location.state || {};
 
@@ -21,30 +24,84 @@ const Game = () => {
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
-    const navigate = useNavigate();
+
     //semi temporary, needs to be changed after db
     const [PlayerD, setPlayer] = useState(RawPlayerData);
     const [SettingsD, setSettings] = useState(RawSettings);
     const [StatsD, setStats] = useState(RawStats);
-
+    console.log(boardToFen(board, turn))
     //this is temporary, when database is working it will use different method
     let PlayerId = "4" //temp to change player in chatbox
     let t_PlayerId = ""
     let pFound = false
-    for(let i = 0; i < RawPlayerData.length;) {
-        if(RawPlayerData[i].PlayerId === PlayerId){
+    for (let i = 0; i < RawPlayerData.length;) {
+        if (RawPlayerData[i].PlayerId === PlayerId) {
             t_PlayerId = i;
             pFound = true;
             break
-        }else{
+        } else {
             i++;
         }
     };
     //it will throw alert when data not found in dummydata file
-    if(!pFound){
+    if (!pFound) {
         alert("player data not found")
     };
-    
+
+    //CODE DUMP ALERT: GAME MECHANICS YIPPEE
+    function handleSquareClick(square) {
+        //convert ts back to numerical coords so the code can handle it
+        const { row, col } = algToCoords(square);
+        const piece = board[row][col];
+        console.log("clicked on " + square + " which has piece: " + piece);
+
+        if (!selected) {
+            if (!piece) return;
+
+            const isWhite = piece === piece.toUpperCase();
+            //if it's the player's turn and they click on their own piece, select it. Same goes for black. 
+            //This might need to be changed for when the bot can actually move their own damn pieces.
+            //something like "if piece colour equal to player colour -> then do shit."
+            if ((turn === "white" && isWhite) || (turn === "black" && !isWhite)) {
+                setSelected({ row, col });
+                const highlight = getMoves(board, row, col);
+                Object.values(highlight).forEach(coord => {
+                    const toAlg = coordsToAlg(coord.row, coord.col);
+                    //console.log(coord, "->", toAlg);
+                    const elem = document.getElementById(toAlg);
+                    elem.classList.add('available');
+                });
+            }
+            return;
+        }
+        //deselect if clicked on the same square as before.
+        if (selected.row === row && selected.col === col) {
+            console.log("Unselected!")
+            setSelected(null);
+            const avElement = document.querySelectorAll('.available');
+            avElement.forEach(elem => {
+                elem.classList.remove('available');
+            })
+            return;
+        }
+        //getMoves returns the result of one of get_Moves in moves.js
+        const legalMoves = getMoves(board, selected.row, selected.col);
+        const isLegal = legalMoves.some(
+            move => move.row === row && move.col === col
+        );
+
+        if (isLegal) {
+            const newBoard = makeMove(board, selected, { row, col });
+            setboard(newBoard);
+            setTurn(turn === "white" ? "black" : "white");
+        }
+        setSelected(null);
+        const avElement = document.querySelectorAll('.available');
+        avElement.forEach(elem => {
+            elem.classList.remove('available');
+        })
+    }
+
 
     function handleResign() {
         setGameOver(true);
@@ -60,7 +117,7 @@ const Game = () => {
                 <div className="board-wrapper">
                     <div className="board-header"></div>
                     <div className="chess-board">
-                        <Chessboard board={board} />
+                        <Chessboard board={board} squareClick={handleSquareClick} selected={selected} />
                     </div>
                     <div className="board-footer"></div>
                 </div>
@@ -107,7 +164,7 @@ const Game = () => {
                     {/* Bottom player, map the user data*/}
                     <div className="player-card bottom-player">
                         <div className="avatar">
-                            <img src={SettingsD[t_PlayerId].ProfilePic}/>
+                            <img src={SettingsD[t_PlayerId].ProfilePic} />
                         </div>
                         <div className="player-info">
                             <div className="player-name">{PlayerD[t_PlayerId].Name}</div>
