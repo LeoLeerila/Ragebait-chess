@@ -16,7 +16,7 @@ function RegisterForm() {
         setForm({...form, [event.target.name]: event.target.value});
     }
     //handles form submission
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         //prevent page reloading upon submission
         event.preventDefault();
         //very simple check if passwords match
@@ -26,9 +26,25 @@ function RegisterForm() {
         alert("Passwords do not match");
         return;
         }
-        //for now this just console logs a succesful registration and shows the values submitted
         console.log("Submission succesful:", form);
-        //this is probably where the logic for sending registration data to the backend would go, once it's time for that
+        const response = await fetch("/api/player/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                playerName: form.displayname,
+                email: form.email,
+                password: form.password
+            })
+        })
+        const data = await response.json();
+        if (!response.ok) {
+            console.error("Error registering player:", data);
+            return;
+        }
+        localStorage.setItem("user", JSON.stringify(user));
+        console.log("Response from backend:", data);
     }
 
 //html section
