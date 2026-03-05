@@ -4,7 +4,7 @@ const {
     signup,
     login,
     //getAllPlayers,
-    //getPlayerById,
+    getPlayerById,
     //createPlayer,
     updatePlayer,
     deletePlayer,
@@ -38,15 +38,15 @@ router.post("/signup", signup); //router.post("/", createPlayer); // Create new 
 // POST /login
 router.post("/login", login)
 
-// GET /players/:playerId
-//router.get("/:playerId", getPlayerById);
-
 router.use(requireAuth);
 
-// PUT /players/:playerId
-router.put("/", updatePlayer);
+// GET /players/
+router.get("/", getPlayerById);
 
-// DELETE /players/:playerId
+// PUT /players/
+router.patch("/", updatePlayer);
+
+// DELETE /players/
 router.delete("/", deletePlayer);
 
 // Update player using PATCH 

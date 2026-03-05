@@ -26,12 +26,6 @@ const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
 
-const decodeToken = (authorization) => {
-  const token = authorization.split(" ")[1];
-  const { _id } = jwt.verify(token, process.env.SECRET);
-  return _id
-}
-
 // login a player
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -125,9 +119,9 @@ const createPlayer = async (req, res) => {
 };
  */
 
-// GET /players/:playerId
-/* const getPlayerById = async (req, res) => {
-  const { playerId } = req.params;
+// GET /player/
+const getPlayerById = async (req, res) => {
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid player ID" });
@@ -136,20 +130,18 @@ const createPlayer = async (req, res) => {
   try {
     const player = await Player.findById(playerId);
     if (player) {
-      res.status(200).json(player);
+      res.status(200).json({ playerName: player.playerName, email: player.email });
     } else {
       res.status(404).json({ message: "Player not found" });
     }
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve player" });
   }
-}; */
+};
 
-// PUT /players/:playerId
+// PATCH /players/:playerId
 const updatePlayer = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid player ID" });
@@ -172,12 +164,12 @@ const updatePlayer = async (req, res) => {
         throw Error("Email not valid");
       }
       const exists = await Player.findOne({ email });
-      if (exists) {
+      if (exists && !exists._id.equals(req.user._id)) {
         throw Error("Email already in use");
       }
     }
 
-    const updatedPlayer = await Player.findOneAndReplace(
+    const updatedPlayer = await Player.findOneAndUpdate(
       { _id: playerId },
       { ...req.body },
       { new: true }
@@ -185,7 +177,7 @@ const updatePlayer = async (req, res) => {
     if (updatedPlayer) {
       // create a token
       const token = createToken(updatedPlayer._id);
-      res.status(200).json(updatedPlayer.playerName);
+      res.status(200).json({ playerName: updatedPlayer.playerName, email: updatedPlayer.email, token });
     } else {
       res.status(404).json({ message: "Player not found" });
     }
@@ -217,10 +209,7 @@ const updatePlayer = async (req, res) => {
 
 // DEL /player
 const deletePlayer = async (req, res) => {
-
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid player ID" });
@@ -249,7 +238,7 @@ module.exports = {
   signup,
   login,
   //getAllPlayers,
-  //getPlayerById,
+  getPlayerById,
   //createPlayer,
   updatePlayer,
   deletePlayer,

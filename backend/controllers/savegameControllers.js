@@ -3,12 +3,6 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
 
-const decodeToken = (authorization) => {
-  const token = authorization.split(" ")[1];
-  const { _id } = jwt.verify(token, process.env.SECRET);
-  return _id
-}
-
 /* example boardState as fen
 starting positions
 rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
@@ -73,9 +67,7 @@ note castling ->  white(player) can castle [K]ing and [Q]ueen side
 
 // GET /savegames
 const getAllSavegames = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   try {
     const savegames = await Savegame.find({playerId}).sort({ createdAt: -1 });
@@ -87,9 +79,7 @@ const getAllSavegames = async (req, res) => {
  
 // POST /savegames
 const createSavegame = async (req, res) => {
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   try {
     const newSavegame = await Savegame.create({ playerId: playerId, ...req.body });
@@ -122,9 +112,7 @@ const getSavegameById = async (req, res) => {
 // PUT /savegames/:savegameId
 const updateSavegame = async (req, res) => {
   const { savegameId } = req.params;
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(savegameId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
@@ -149,9 +137,7 @@ const updateSavegame = async (req, res) => {
 // DELETE /savegames/:savegameId
 const deleteSavegame = async (req, res) => {
   const { savegameId } = req.params;
-  const { authorization } = req.headers;
-
-  const playerId = decodeToken(authorization)
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(savegameId)) {
     return res.status(400).json({ message: "Invalid savegame ID" });
