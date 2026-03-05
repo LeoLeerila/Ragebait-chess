@@ -119,9 +119,9 @@ const createPlayer = async (req, res) => {
 };
  */
 
-// GET /players/:playerId
-/* const getPlayerById = async (req, res) => {
-  const { playerId } = req.params;
+// GET /player/
+const getPlayerById = async (req, res) => {
+  const playerId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(playerId)) {
     return res.status(400).json({ message: "Invalid player ID" });
@@ -130,14 +130,14 @@ const createPlayer = async (req, res) => {
   try {
     const player = await Player.findById(playerId);
     if (player) {
-      res.status(200).json(player);
+      res.status(200).json({playerName: player.playerName, email: player.email});
     } else {
       res.status(404).json({ message: "Player not found" });
     }
   } catch (error) {
     res.status(500).json({ message: "Failed to retrieve player" });
   }
-}; */
+};
 
 // PUT /players/:playerId
 const updatePlayer = async (req, res) => {
@@ -238,7 +238,7 @@ module.exports = {
   signup,
   login,
   //getAllPlayers,
-  //getPlayerById,
+  getPlayerById,
   //createPlayer,
   updatePlayer,
   deletePlayer,
