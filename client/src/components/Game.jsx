@@ -35,7 +35,7 @@ const Game = () => {
     const [isGameStarted, setIsGameStarted] = useState(false);
     //Goodbye chat
     //Chat states
-    const [chatH, setChatH] = useState([{ ctxt: "Greetings type to type here or something like that", isbot: true }]);
+    const [chatH, setChatH] = useState([]); // Answer: "Greetings type to type here or something like that", isLLMAnswer: true 
     const [chatP, setChatP] = useState("");
 
     // custom hook to fetch stuff
@@ -46,7 +46,7 @@ const Game = () => {
     //here later will be also aipreset
 
     //stockfish
-    const [isBotThinkig, setBotThink] = useState(false);
+    const [isBotThinkig, setBotThink] = useState(isLoading);
     const [isPlayerSaid, setPSaid] = useState(false);
     const [bestMove, setBestMove] = useState("");
 
@@ -59,6 +59,8 @@ const Game = () => {
             const statsData = await fetchData('/stats/', "GET", token)
             const settingsData = await fetchData('/settings/', "GET", token)
 
+            //Do here also the Ai preset
+
             setPlayerD(playerData);
             setStatsD(statsData);
             setSettingsD(settingsData);
@@ -66,60 +68,50 @@ const Game = () => {
         fetchStuff()
     }, [])
 
-    //i dont really know what the hell a am doing 
+    //i dont really know what the hell am doing -oleruu
     useEffect(()=>{
-
         if(playerColor !== turn){
-            handleBotThink(true)
+            setChatP("") //clear chat
+            handleBotThink(true) //self explanatory
             const stockfish = new Worker("./stockfish-18-single.js");
-            const DEPTH = 10; // number of halfmoves the engine looks ahead
+            const DEPTH = 10; // number of halfmoves the engine looks ahead, in future i think LLM will decide from ready made options like min 5, max 10
             stockfish.postMessage("uci");
             stockfish.postMessage(`position fen ${boardToFen(board, turn)}`);
             stockfish.postMessage(`go depth ${DEPTH}`);
 
             stockfish.onmessage = (e) => {
-                console.log(e)
                 let data = e.data
                 if (data.includes("bestmove")){
-                    data = data.split(" ")[1]
-                    setBestMove(data)
-                    handleBotThink(false)
+                    data = data.split(" ")[1] //makes "bestmove c7c6 ponder b5a4" => "c7c6"
                     console.log(data)
-                    
+                    setBestMove(data)
+                    handleBotThink(false)     
                 }
             }
        
         };
     },[turn])
 
-
-    async function SaySomethingLLM(){
-
-    }
-
     useEffect(()=>{
         const speakSomething = async () => {
             if(isPlayerSaid){
-            console.log(isPlayerSaid)
-
-            // next return data should be
             //do here the uhh the that uhh thing ... the bot
-            // //temp data for testing purposes, there should be also aipreset (name & all of the stuff)
+            //this makes the fetch to backend and that then goes to LLM
             const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
                 botBoard: {
                     fen: boardToFen(board, turn),
-                    currenMoves: bestMove,
-                    blocked: [],
+                    currentMoves: bestMove,
                     history: chatH,
                     botChessC: "BLACK"
                 },
                 botPreset: {AiName:"Evil Larry",info: "A temperamental, evil cat overlord known as Larry.",botElo: "1200"},
                 playerAns: chatP,
+                playerMove: "Needs to be added"
             })
-
-            await handelChatUpd(data.data, true);
-            setChatP("")
-            setPSaid(false)
+            console.log(data)
+            await handelChatUpd(data.data.answer, true); // update chat
+            setChatP("") //clear
+            setPSaid(false) //is player spoken
         }}
         speakSomething()
     },[isPlayerSaid])
@@ -191,27 +183,27 @@ const Game = () => {
 
     // handle stuf, because react
     async function handelChatUpd(txt, isbot) {
-        setChatH((chatH) => { return [...chatH, { ctxt: txt, isbot: isbot }] })
+        setChatH((chatH) => { return [...chatH, { answer: txt, isLLMAnswer: isbot }] }) // makes chat update instant
     };
     async function handleBotThink(tf) {
-        setBotThink(tf)
+        setBotThink(tf) //basicaly same thing as chat
     }
 
     //this is for the chat
     const onSubmitChat = async (e) => {
         e.preventDefault();
-
-        await handelChatUpd(chatP, false);  // chat became liiitle bit more complicated
-
+        if(playerColor !== turn){
+            await handelChatUpd(chatP, false);  // chat became liiitle bit more complicated
+                setPSaid(true) // is player spoken
+        }else{
+            setChatP("Make a move first!") //if stockfish calc not ready sets player txt to this
+        }
         
-        console.log(bestMove)
-        setPSaid(true)
     };
 
 
     return (
         <div className="game-base" >
-            
             {/* GAME BOARD AND DISCARDED PIECES */}
             <div className="main-layout">
                 <div className="board-wrapper">
@@ -253,7 +245,7 @@ const Game = () => {
                     <div className="chat-input">
                         <form onSubmit={onSubmitChat}>
                             {isBotThinkig ? <p>Bot is thinkig</p>:<input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))}/>}
-                            {isBotThinkig ? null:<button className="send-button">&#11127;</button>}
+                            {isBotThinkig ? null:<button className="send-button">&#11127;</button>} {/*next turn button*/} 
                         </form>
                     </div>
 
