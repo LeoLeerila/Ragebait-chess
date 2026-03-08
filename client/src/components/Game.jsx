@@ -1,5 +1,5 @@
 import './Game.css'
-import { React, useEffect, useState } from 'react'
+import { React, use, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
@@ -7,6 +7,8 @@ import { getMoves, makeMove } from './logic/moves';
 import GameOver from './gameOver';
 import ChatTxt from "./gameChat";
 import useFetchBetter from "./hooks/useFetchBetter";
+
+// import useFish from './hooks/useFish';
 
 //these are dummydata for use before database
 import { algToCoords, coordsToAlg, boardToFen } from './logic/helps';
@@ -29,30 +31,99 @@ const Game = () => {
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
 
+    const [playerColor, setPlayerColor] = useState("white");
+    const [isGameStarted, setIsGameStarted] = useState(false);
     //Goodbye chat
     //Chat states
     const [chatH, setChatH] = useState([{ ctxt: "Greetings type to type here or something like that", isbot: true }]);
     const [chatP, setChatP] = useState("");
 
     // custom hook to fetch stuff
-    const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`)
-    const [playerD, setPlayerD] = useState({})
-    const [settingsD, setSettingsD] = useState({})
-    const [statsD, setStatsD] = useState({})
+    const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`);
+    const [playerD, setPlayerD] = useState({});
+    const [settingsD, setSettingsD] = useState({});
+    const [statsD, setStatsD] = useState({});
+    //here later will be also aipreset
 
+    //stockfish
+    const [isBotThinkig, setBotThink] = useState(false);
+    const [isPlayerSaid, setPSaid] = useState(false);
+    const [bestMove, setBestMove] = useState("");
+
+
+    
     // This load player info
     useEffect(() => {
-            const fetchStuff = async () => {
-                const playerData = await fetchData('/player/',"GET",token)
-                const statsData = await fetchData('/stats/',"GET",token)
-                const settingsData = await fetchData('/settings/',"GET",token)
-    
-                setPlayerD(playerData);
-                setStatsD(statsData);
-                setSettingsD(settingsData);
+        const fetchStuff = async () => {
+            const playerData = await fetchData('/player/', "GET", token)
+            const statsData = await fetchData('/stats/', "GET", token)
+            const settingsData = await fetchData('/settings/', "GET", token)
+
+            setPlayerD(playerData);
+            setStatsD(statsData);
+            setSettingsD(settingsData);
+        }
+        fetchStuff()
+    }, [])
+
+    //i dont really know what the hell a am doing 
+    useEffect(()=>{
+
+        if(playerColor !== turn){
+            handleBotThink(true)
+            const stockfish = new Worker("./stockfish-18-single.js");
+            const DEPTH = 10; // number of halfmoves the engine looks ahead
+            stockfish.postMessage("uci");
+            stockfish.postMessage(`position fen ${boardToFen(board, turn)}`);
+            stockfish.postMessage(`go depth ${DEPTH}`);
+
+            stockfish.onmessage = (e) => {
+                console.log(e)
+                let data = e.data
+                if (data.includes("bestmove")){
+                    data = data.split(" ")[1]
+                    setBestMove(data)
+                    handleBotThink(false)
+                    console.log(data)
+                    
+                }
             }
-            fetchStuff()
-        }, [])
+       
+        };
+    },[turn])
+
+
+    async function SaySomethingLLM(){
+
+    }
+
+    useEffect(()=>{
+        const speakSomething = async () => {
+            if(isPlayerSaid){
+            console.log(isPlayerSaid)
+
+            // next return data should be
+            //do here the uhh the that uhh thing ... the bot
+            // //temp data for testing purposes, there should be also aipreset (name & all of the stuff)
+            const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
+                botBoard: {
+                    fen: boardToFen(board, turn),
+                    currenMoves: bestMove,
+                    blocked: [],
+                    history: chatH,
+                    botChessC: "BLACK"
+                },
+                botPreset: {AiName:"Evil Larry",info: "A temperamental, evil cat overlord known as Larry.",botElo: "1200"},
+                playerAns: chatP,
+            })
+
+            await handelChatUpd(data.data, true);
+            setChatP("")
+            setPSaid(false)
+        }}
+        speakSomething()
+    },[isPlayerSaid])
+
 
     console.log(boardToFen(board, turn))
 
@@ -118,10 +189,13 @@ const Game = () => {
         setMethod("resignation");
     }
 
-
+    // handle stuf, because react
     async function handelChatUpd(txt, isbot) {
         setChatH((chatH) => { return [...chatH, { ctxt: txt, isbot: isbot }] })
     };
+    async function handleBotThink(tf) {
+        setBotThink(tf)
+    }
 
     //this is for the chat
     const onSubmitChat = async (e) => {
@@ -129,32 +203,15 @@ const Game = () => {
 
         await handelChatUpd(chatP, false);  // chat became liiitle bit more complicated
 
-        //do here the uhh the that uhh thing ... the bot
-
-        setChatP("")
-
-        // next return data should be
-
-        //temp data for testing purposes, there should be also aipreset (name & all of the stuff)
-        const data = await fetchData('/ai/generate-nxt-move',"POST",token,{
-            botBoard:{
-                fen:boardToFen(board, turn),
-                currenMoves:[],
-                blocked:[],
-                history:chatH,
-                botChessC:"BLACK",
-                botElo:"1200"
-            },
-            botPreset:{}, 
-            playerAns:chatP,
-        })
-
-        await handelChatUpd(data.data, true);
+        
+        console.log(bestMove)
+        setPSaid(true)
     };
 
 
     return (
-        <div className="game-base">
+        <div className="game-base" >
+            
             {/* GAME BOARD AND DISCARDED PIECES */}
             <div className="main-layout">
                 <div className="board-wrapper">
@@ -195,8 +252,8 @@ const Game = () => {
 
                     <div className="chat-input">
                         <form onSubmit={onSubmitChat}>
-                            <input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))} />
-                            <button className="send-button">&#11127;</button>
+                            {isBotThinkig ? <p>Bot is thinkig</p>:<input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))}/>}
+                            {isBotThinkig ? null:<button className="send-button">&#11127;</button>}
                         </form>
                     </div>
 
