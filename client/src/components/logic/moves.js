@@ -50,38 +50,38 @@ function reusableMove(board, row, col, directions) {
 function getKing(board, colour) {
     const king = colour === "white" ? "K" : "k";
     //locate the mf
-    for(let row = 0; row < 8; row++) {
-        for(let col= 0; col < 8; col++) {
-            if(board[row][col] === king) {
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            if (board[row][col] === king) {
                 //return the location of the king
-                return {row, col}
+                return { row, col }
             }
         }
     }
     return null;
 }
 
-function isInCheck(board, colour){
+function isInCheck(board, colour, castlingRight) {
     const kingPos = getKing(board, colour); //return coords of our king
-    
-    for(let row = 0; row < 8; row++){
-        for(let col= 0; col < 8; col++){
+
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
             const piece = board[row][col];
             if (!piece) continue;
             //skip friendly pieces
-            if ((colour === "white" && isWhite(piece)) || (colour === "black" && !isWhite(piece))){
+            if ((colour === "white" && isWhite(piece)) || (colour === "black" && !isWhite(piece))) {
                 continue;
             }
             //get potential enemy moves (getMoves() in getMoves()? Sounds fun.)
-            const enemyMoves = pseudoMoves(board, row, col);
+            const enemyMoves = pseudoMoves(board, row, col, castlingRight);
             //if some of them can move to the kings spot during their turn
-            if(enemyMoves.some(move => move.row === kingPos.row && move.col === kingPos.col)) {
+            if (enemyMoves.some(move => move.row === kingPos.row && move.col === kingPos.col)) {
                 return true;
             }
         }
     }
 
-    return false; 
+    return false;
 }
 
 
@@ -163,10 +163,14 @@ function getQueenMoves(board, row, col) {
         [1, 0], [0, -1], [-1, 0], [0, 1]
     ]);
 }
-function getKingMoves(board, row, col) {
+function getKingMoves(board, row, col, castleRight) {
     //console.log("getting king moves for: ", row, col)
     const piece = board[row][col];
     const moves = [];
+    const whitePiece = isWhite(piece);
+    const homeRow = whitePiece ? 7 : 0;
+    const kingSide = whitePiece ? castleRight.K : castleRight.k;
+    const queenSide = whitePiece ? castleRight.Q : castleRight.q;
 
     const offsets = [
         [0, 1], [1, 0], [1, 1], [1, -1],
@@ -183,46 +187,97 @@ function getKingMoves(board, row, col) {
             moves.push({ row: r, col: c })
         }
     }
+    //Basically if king is at his starting position and there's a clear way 
+    if (row===homeRow && col === 4 && kingSide && board[homeRow][5] === null && board[homeRow][6] === null) {
+        //console.log("True for: ", whitePiece ? "K" : "k")
+        moves.push({
+            row: homeRow,
+            col: 6,
+            castlingRight: whitePiece ? "K" : "k"
+        });
+    }
+    //same for queen side
+    if (row===homeRow && col === 4 && queenSide && board[homeRow][1] === null && board[homeRow][2] === null && board[homeRow][3] === null) {
+        //console.log("True for: ", whitePiece ? "Q" : "q")
+        moves.push({
+            row: homeRow,
+            col: 6,
+            castlingRight: whitePiece ? "Q" : "q"
+        });
+    }
 
     return moves;
 }
 //turned into a function so that getMoves() and isInCheck() can use it
 //ainii ja älkää tehkö tätä virhettä: mä yritin kutsua getMoves() (koska tämä kyseinen switch case) ton isInCheck() sisällä... vaikka isInCheck() on getMoves() sisällä.....
 //... not my brightest moment.
-function pseudoMoves(board, row, col) {
+function pseudoMoves(board, row, col, castlingRight) {
     const piece = board[row][col];
     if (!piece) return [];
-        switch (piece.toLowerCase()) {
-            case 'p': return getPawnMoves(board, row, col);
-            case 'r': return getRookMoves(board, row, col);
-            case 'n': return getKnightMoves(board, row, col);
-            case 'b': return getBishopMoves(board, row, col);
-            case 'q': return getQueenMoves(board, row, col);
-            case 'k': return getKingMoves(board, row, col);
-            default: return [];
-        }
+    switch (piece.toLowerCase()) {
+        case 'p': return getPawnMoves(board, row, col);
+        case 'r': return getRookMoves(board, row, col);
+        case 'n': return getKnightMoves(board, row, col);
+        case 'b': return getBishopMoves(board, row, col);
+        case 'q': return getQueenMoves(board, row, col);
+        case 'k': return getKingMoves(board, row, col, castlingRight);
+        default: return [];
     }
+}
 // make the check for legal moves
-export function getMoves(board, row, col) {
+export function getMoves(board, row, col, castlingRight) {
     const piece = board[row][col];
     if (!piece) return [];
-    
+
     const colour = piece === piece.toUpperCase() ? "white" : "black";
-    const moves = pseudoMoves(board, row, col);
+    const moves = pseudoMoves(board, row, col, castlingRight);
+    console.log(moves)
     //now HERE we take out the moves that put the king in risk
     const legalMoves = moves.filter(move => {
-        const simulation = makeMove(board, {row, col}, move);
-        return !isInCheck(simulation, colour)
+        const simulation = makeMove(board, { row, col, }, move);
+        return !isInCheck(simulation, colour, castlingRight)
     });
-    
+
     return legalMoves;
 }
 
 export function makeMove(board, fromSpot, to) {
     //map out current board
+    const piece = board[fromSpot.row][fromSpot.col];
     const newBoard = board.map(r => [...r]);
     //get piece from "fromSpot" and move it into "to". then set null the old spot.
     newBoard[to.row][to.col] = newBoard[fromSpot.row][fromSpot.col];
     newBoard[fromSpot.row][fromSpot.col] = null;
+
+    //castling movements for rook
+    console.log(to)
+    console.log(to.castlingRight)
+    if(to.castlingRight === "K") {
+        newBoard[7][5] = "R";
+        newBoard[7][7] = null;
+    }
+    if(to.castlingRight === "Q") {
+        newBoard[7][3] = "R";
+        newBoard[7][0] = null;
+    }
+    if(to.castlingRight === "k") {
+        newBoard[0][5] = "r";
+        newBoard[0][7] = null;
+    }
+    if(to.castlingRight === "q") {
+        newBoard[0][3] = "r";
+        newBoard[0][0] = null;
+    }
+
+    //pawn promotion (Automatic queen)
+    if(piece === "P" && to.row === 0) {
+        console.log("Passed!")
+        newBoard[to.row][to.col] = "Q";
+    }
+    if ( piece === "p" && to.row === 7) {
+        console.log("Passed!")
+        newBoard[to.row][to.col] = "q";
+    }
+
     return newBoard;
 }

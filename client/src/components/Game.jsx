@@ -20,8 +20,14 @@ const Game = () => {
     const location = useLocation();
     const { opponent, playerSide, godmode } = location.state || {};
 
-    //set the starting board so it can be used to build the start of the game
+    //setting up the game
     const [board, setboard] = useState(initBoard);
+    const [castlingRight, setCastlingRight] = useState({
+        K: true,
+        Q: true,
+        k: true,
+        q: true
+    })
     const [turn, setTurn] = useState("white");
     const [selected, setSelected] = useState(null);
     const [history, setHistory] = useState([]);
@@ -42,19 +48,43 @@ const Game = () => {
 
     // This load player info
     useEffect(() => {
-            const fetchStuff = async () => {
-                const playerData = await fetchData('/player/',"GET",token)
-                const statsData = await fetchData('/stats/',"GET",token)
-                const settingsData = await fetchData('/settings/',"GET",token)
-    
-                setPlayerD(playerData);
-                setStatsD(statsData);
-                setSettingsD(settingsData);
-            }
-            fetchStuff()
-        }, [])
+        const fetchStuff = async () => {
+            const playerData = await fetchData('/player/', "GET", token)
+            const statsData = await fetchData('/stats/', "GET", token)
+            const settingsData = await fetchData('/settings/', "GET", token)
 
-    console.log(boardToFen(board, turn))
+            setPlayerD(playerData);
+            setStatsD(statsData);
+            setSettingsD(settingsData);
+        }
+        fetchStuff()
+    }, [])
+
+    console.log(boardToFen(board, turn, castlingRight))
+
+    function updateCastlingRights(castlingRight, piece, from) {
+        const rights = { ...castlingRight };
+        if (piece === "K") {
+            rights.K = false;
+            rights.Q = false;
+        }
+
+        if (piece === "k") {
+            rights.k = false;
+            rights.q = false;
+        }
+
+        if (piece === "R") {
+            if (from.row === 7 && from.col === 7) rights.K = false;
+            if (from.row === 7 && from.col === 0) rights.Q = false;
+        }
+
+        if (piece === "r") {
+            if (from.row === 0 && from.col === 7) rights.k = false;
+            if (from.row === 0 && from.col === 0) rights.q = false;
+        }
+        return rights;
+    }
 
     //CODE DUMP ALERT: GAME MECHANICS YIPPEE
     function handleSquareClick(square) {
@@ -72,7 +102,7 @@ const Game = () => {
             //something like "if piece colour equal to player colour -> then do shit."
             if ((turn === "white" && isWhite) || (turn === "black" && !isWhite)) {
                 setSelected({ row, col });
-                const highlight = getMoves(board, row, col);
+                const highlight = getMoves(board, row, col, castlingRight);
                 Object.values(highlight).forEach(coord => {
                     const toAlg = coordsToAlg(coord.row, coord.col);
                     //console.log(coord, "->", toAlg);
@@ -93,16 +123,29 @@ const Game = () => {
             return;
         }
         //getMoves returns the result of one of get_Moves in moves.js
-        const legalMoves = getMoves(board, selected.row, selected.col);
-        const isLegal = legalMoves.some(
+        const legalMoves = getMoves(board, selected.row, selected.col, castlingRight);
+        console.log(legalMoves)
+        const isLegal = legalMoves.find(
             move => move.row === row && move.col === col
         );
 
         if (isLegal) {
-            const newBoard = makeMove(board, selected, { row, col });
+            const move = legalMoves.find(
+                m => m.row === row && m.col === col
+            );
+            const newBoard = makeMove(board, selected, move);
+            const piece = board[selected.row][selected.col];
+            const newCastlingRights = updateCastlingRights(
+                castlingRight,
+                piece,
+                selected
+            )
             setboard(newBoard);
+            setCastlingRight(newCastlingRights);
             setTurn(turn === "white" ? "black" : "white");
         }
+
+
         setSelected(null);
         const avElement = document.querySelectorAll('.available');
         avElement.forEach(elem => {
@@ -136,17 +179,17 @@ const Game = () => {
         // next return data should be
 
         //temp data for testing purposes, there should be also aipreset (name & all of the stuff)
-        const data = await fetchData('/ai/generate-nxt-move',"POST",token,{
-            botBoard:{
-                fen:boardToFen(board, turn),
-                currenMoves:[],
-                blocked:[],
-                history:chatH,
-                botChessC:"BLACK",
-                botElo:"1200"
+        const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
+            botBoard: {
+                fen: boardToFen(board, turn, castlingRight),
+                currenMoves: [],
+                blocked: [],
+                history: chatH,
+                botChessC: "BLACK",
+                botElo: "1200"
             },
-            botPreset:{}, 
-            playerAns:chatP,
+            botPreset: {},
+            playerAns: chatP,
         })
 
         await handelChatUpd(data.data, true);
