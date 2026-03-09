@@ -1,10 +1,11 @@
 import {useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
 
 //simple registration form function taking inspiration from the first coding marathon's BookCollectionManager.jsx
 function RegisterForm() {
     //state object
+    const navigate = useNavigate();
     const [form, setForm] = useState({
         displayname: "",
         email: "",
@@ -26,7 +27,6 @@ function RegisterForm() {
         alert("Passwords do not match");
         return;
         }
-        console.log("Submission succesful:", form);
         const response = await fetch("/api/player/signup", {
             method: "POST",
             headers: {
@@ -43,8 +43,10 @@ function RegisterForm() {
             console.error("Error registering player:", data);
             return;
         }
-        localStorage.setItem("user", JSON.stringify(user));
+        console.log("Submission succesful:", form);
+        localStorage.setItem("user", JSON.stringify(data));
         console.log("Response from backend:", data);
+        navigate("/")
     }
 
 //html section
