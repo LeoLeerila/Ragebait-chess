@@ -32,11 +32,12 @@ const Game = () => {
     const [method, setMethod] = useState(null);
 
     const [playerColor, setPlayerColor] = useState("white");
-    const [isGameStarted, setIsGameStarted] = useState(false);
+    
     //Goodbye chat
     //Chat states
-    const [chatH, setChatH] = useState([]); // Answer: "Greetings type to type here or something like that", isLLMAnswer: true 
+    const [chatH, setChatH] = useState([]); // [{Answer: "Greetings type to type here or something like that", isLLMAnswer: true},{Answer: "Greetings", isLLMAnswer: false}] 
     const [chatP, setChatP] = useState("");
+    const [isLoadingTxt, setLoadingTxt] = useState("Make a move first")
 
     // custom hook to fetch stuff
     const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`);
@@ -49,9 +50,9 @@ const Game = () => {
     const [isBotThinkig, setBotThink] = useState(isLoading);
     const [isPlayerSaid, setPSaid] = useState(false);
     const [bestMove, setBestMove] = useState("");
+    const [nextTurn, setNextTurn] = useState(false);
 
 
-    
     // This load player info
     useEffect(() => {
         const fetchStuff = async () => {
@@ -69,10 +70,10 @@ const Game = () => {
     }, [])
 
     //i dont really know what the hell am doing -oleruu
-    useEffect(()=>{
-        if(playerColor !== turn){
+    useEffect(() => {
+        if (playerColor !== turn) {
             setChatP("") //clear chat
-            handleBotThink(true) //self explanatory
+            handleBotThink(true, "Bot is thinkig") //self explanatory
             const stockfish = new Worker("./stockfish-18-single.js");
             const DEPTH = 10; // number of halfmoves the engine looks ahead, in future i think LLM will decide from ready made options like min 5, max 10
             stockfish.postMessage("uci");
@@ -81,40 +82,53 @@ const Game = () => {
 
             stockfish.onmessage = (e) => {
                 let data = e.data
-                if (data.includes("bestmove")){
+                if (data.includes("bestmove")) {
                     data = data.split(" ")[1] //makes "bestmove c7c6 ponder b5a4" => "c7c6"
                     console.log(data)
                     setBestMove(data)
-                    handleBotThink(false)     
+                    handleBotThink(false, "Make a move first")
                 }
             }
-       
         };
-    },[turn])
+    }, [turn])
 
-    useEffect(()=>{
+    useEffect(() => {
         const speakSomething = async () => {
-            if(isPlayerSaid){
-            //do here the uhh the that uhh thing ... the bot
-            //this makes the fetch to backend and that then goes to LLM
-            const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
-                botBoard: {
-                    fen: boardToFen(board, turn),
-                    currentMoves: bestMove,
-                    history: chatH,
-                    botChessC: "BLACK"
-                },
-                botPreset: {AiName:"Evil Larry",info: "A temperamental, evil cat overlord known as Larry.",botElo: "1200"},
-                playerAns: chatP,
-                playerMove: "Needs to be added"
-            })
-            console.log(data)
-            await handelChatUpd(data.data.answer, true); // update chat
-            setChatP("") //clear
-            setPSaid(false) //is player spoken
-        }}
+            handleBotThink(true, "Bot is thinkig")
+            if (playerColor !== turn) {
+                if (isPlayerSaid) {
+                    //do here the uhh the that uhh thing ... the bot
+                    //this makes the fetch to backend and that then goes to LLM
+                    const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
+                        botBoard: {
+                            fen: boardToFen(board, turn),
+                            currentMoves: bestMove,
+                            history: chatH,
+                            botChessC: "BLACK"
+                        },
+                        botPreset: {AiName:"Evil Larry",info: "A temperamental, evil cat overlord known as Larry.",botElo: "1200"},
+                        playerAns: chatP,
+                        playerMove: "Needs to be added"
+                    })
+                    console.log(data)
+                    await handelChatUpd(data.data.answer, true); // update chat
+                };
+                
+                const start = bestMove.slice(0, 2)
+                const end = bestMove.slice(2)
+
+                const newBoard = makeMove(board, algToCoords(start),algToCoords(end));
+                setboard(newBoard);
+                setTurn(turn === "white" ? "black" : "white");
+
+                setNextTurn(false)
+                setChatP("") //clear
+                setPSaid(false) //is player spoken
+            }
+        }
+        handleBotThink(false, "Make a move first")
         speakSomething()
-    },[isPlayerSaid])
+    }, [isPlayerSaid, nextTurn])
 
 
     console.log(boardToFen(board, turn))
@@ -185,20 +199,24 @@ const Game = () => {
     async function handelChatUpd(txt, isbot) {
         setChatH((chatH) => { return [...chatH, { answer: txt, isLLMAnswer: isbot }] }) // makes chat update instant
     };
-    async function handleBotThink(tf) {
+    // handle stuff because ******* react
+    async function handleBotThink(tf, ftxt=null) {
         setBotThink(tf) //basicaly same thing as chat
+        if(ftxt !== null){
+            setLoadingTxt(ftxt)
+        }
     }
-
+    
     //this is for the chat
     const onSubmitChat = async (e) => {
         e.preventDefault();
-        if(playerColor !== turn){
+        if (playerColor !== turn) {
             await handelChatUpd(chatP, false);  // chat became liiitle bit more complicated
-                setPSaid(true) // is player spoken
-        }else{
+            setPSaid(true) // is player spoken
+        } else {
             setChatP("Make a move first!") //if stockfish calc not ready sets player txt to this
         }
-        
+
     };
 
 
@@ -218,6 +236,7 @@ const Game = () => {
                         {/* Map const history */}
                     </div>
                     <div className="game-btns">
+                        {isBotThinkig ? <p>{isLoadingTxt}</p>:<button className='next-turn-btn' onClick={(() => setNextTurn(true))}>Next turn (without LLM)</button>}
                         <span className='resign-btn' onClick={handleResign}>Resign ⚐</span>
                     </div>
                 </div>
@@ -244,8 +263,8 @@ const Game = () => {
 
                     <div className="chat-input">
                         <form onSubmit={onSubmitChat}>
-                            {isBotThinkig ? <p>Bot is thinkig</p>:<input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))}/>}
-                            {isBotThinkig ? null:<button className="send-button">&#11127;</button>} {/*next turn button*/} 
+                            {isBotThinkig ? <p>{isLoadingTxt}</p> : <input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))} />}
+                            {isBotThinkig ? null : <button className="send-button">&#11127;</button>} {/*next turn button*/}
                         </form>
                     </div>
 
