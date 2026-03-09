@@ -6,6 +6,7 @@ const aiSchema = new Schema({
   aiName: {
     type: String,
     required: true,
+    unique: true
   },
   systemPrompt: {
     type: String,
