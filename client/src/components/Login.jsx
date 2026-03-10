@@ -4,7 +4,7 @@ import "./Login.css";
 import useFetchBetter from "./hooks/useFetchBetter.js";
 
 //simple login form function made based on Register.jsx
-function LoginForm() {
+function LoginForm({setIsAuthenticated}) {
     //state object
     const { fetchData, isLoading, error } = useFetchBetter(`api`);
     const [form, setForm] = useState({
@@ -27,6 +27,7 @@ function LoginForm() {
             
         if (data) {
             localStorage.setItem("user", JSON.stringify(data));
+            setIsAuthenticated(true)
             console.log("Response from backend:", data);
         }
     }

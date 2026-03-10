@@ -4,7 +4,7 @@ import "./Register.css";
 import useFetchBetter from "./hooks/useFetchBetter.js";
 
 
-function RegisterForm() {
+function RegisterForm({ setIsAuthenticated }) {
     //state object
     const { fetchData, isLoading, error } = useFetchBetter(`api`);
     const [form, setForm] = useState({ displayname: "", email: "", password: "", confirmPassword: "" });
@@ -31,6 +31,7 @@ function RegisterForm() {
             
         if (data) {
             localStorage.setItem("user", JSON.stringify(data));
+            setIsAuthenticated(true);
             console.log("Response from backend:", data);
         }
     }
