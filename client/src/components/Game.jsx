@@ -36,8 +36,6 @@ const Game = () => {
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
-
-    const [playerColor, setPlayerColor] = useState("white");
     
     //Goodbye chat
     //Chat states
@@ -77,9 +75,9 @@ const Game = () => {
 
     //i dont really know what the hell am doing -oleruu
     useEffect(() => {
-        if (playerColor !== turn) {
+        if (playerSide !== turn) {
             setChatP("") //clear chat
-            handleBotThink(true, "Bot is thinkig") //self explanatory
+            handleBotThink(true) //self explanatory. it works, trust me
             const stockfish = new Worker("./stockfish-18-single.js");
             const DEPTH = 10; // number of halfmoves the engine looks ahead, in future i think LLM will decide from ready made options like min 5, max 10
             stockfish.postMessage("uci");
@@ -92,7 +90,7 @@ const Game = () => {
                     data = data.split(" ")[1] //makes "bestmove c7c6 ponder b5a4" => "c7c6"
                     console.log(data)
                     setBestMove(data)
-                    handleBotThink(false, "Make a move first")
+                    handleBotThink(false)
                 }
             }
         };
@@ -101,7 +99,7 @@ const Game = () => {
     useEffect(() => {
         const speakSomething = async () => {
             handleBotThink(true, "Bot is thinkig")
-            if (playerColor !== turn) {
+            if (playerSide !== turn) {
                 if (isPlayerSaid) {
                     //do here the uhh the that uhh thing ... the bot
                     //this makes the fetch to backend and that then goes to LLM
@@ -112,18 +110,18 @@ const Game = () => {
                             history: chatH,
                             botChessC: "BLACK"
                         },
-                        botPreset: {AiName:"Evil Larry",info: "A temperamental, evil cat overlord known as Larry.",botElo: "1200"},
+                        botPreset: { AiName: "Evil Larry", info: "A temperamental, evil cat overlord known as Larry.", botElo: "1200" },
                         playerAns: chatP,
                         playerMove: "Needs to be added"
                     })
                     console.log(data)
                     await handelChatUpd(data.data.answer, true); // update chat
                 };
-                
+
                 const start = bestMove.slice(0, 2)
                 const end = bestMove.slice(2)
 
-                const newBoard = makeMove(board, algToCoords(start),algToCoords(end));
+                const newBoard = makeMove(board, algToCoords(start), algToCoords(end));
                 setboard(newBoard);
                 setTurn(turn === "white" ? "black" : "white");
 
@@ -132,10 +130,9 @@ const Game = () => {
                 setPSaid(false) //is player spoken
             }
         }
-        handleBotThink(false, "Make a move first")
+        handleBotThink(false)
         speakSomething()
     }, [isPlayerSaid, nextTurn])
-
 
     console.log(boardToFen(board, turn, castlingRight))
 
@@ -165,60 +162,61 @@ const Game = () => {
 
     //CODE DUMP ALERT: GAME MECHANICS YIPPEE
     function handleSquareClick(square) {
-        //convert ts back to numerical coords so the code can handle it
-        const { row, col } = algToCoords(square);
-        const piece = board[row][col];
-        console.log("clicked on " + square + " which has piece: " + piece);
+        if (playerSide === turn) {
+            //convert ts back to numerical coords so the code can handle it
+            const { row, col } = algToCoords(square);
+            const piece = board[row][col];
+            console.log("clicked on " + square + " which has piece: " + piece);
 
-        if (!selected) {
-            if (!piece) return;
+            if (!selected) {
+                if (!piece) return;
 
-            const isWhite = piece === piece.toUpperCase();
-            //if it's the player's turn and they click on their own piece, select it. Same goes for black. 
-            //This might need to be changed for when the bot can actually move their own damn pieces.
-            //something like "if piece colour equal to player colour -> then do shit."
-            if ((turn === "white" && isWhite) || (turn === "black" && !isWhite)) {
-                setSelected({ row, col });
-                const highlight = getMoves(board, row, col, castlingRight);
-                Object.values(highlight).forEach(coord => {
-                    const toAlg = coordsToAlg(coord.row, coord.col);
-                    //console.log(coord, "->", toAlg);
-                    const elem = document.getElementById(toAlg);
-                    elem.classList.add('available');
-                });
+                const isWhite = piece === piece.toUpperCase();
+                //if it's the player's turn and they click on their own piece, select it. Same goes for black. 
+                //This might need to be changed for when the bot can actually move their own damn pieces.
+                //something like "if piece colour equal to player colour -> then do shit."
+                if ((turn === "white" && isWhite) || (turn === "black" && !isWhite)) {
+                    setSelected({ row, col });
+                    const highlight = getMoves(board, row, col, castlingRight);
+                    Object.values(highlight).forEach(coord => {
+                        const toAlg = coordsToAlg(coord.row, coord.col);
+                        //console.log(coord, "->", toAlg);
+                        const elem = document.getElementById(toAlg);
+                        elem.classList.add('available');
+                    });
+                }
+                return;
             }
-            return;
-        }
-        //deselect if clicked on the same square as before.
-        if (selected.row === row && selected.col === col) {
-            console.log("Unselected!")
-            setSelected(null);
-            const avElement = document.querySelectorAll('.available');
-            avElement.forEach(elem => {
-                elem.classList.remove('available');
-            })
-            return;
-        }
-        //getMoves returns the result of one of get_Moves in moves.js
-        const legalMoves = getMoves(board, selected.row, selected.col, castlingRight);
-        console.log(legalMoves)
-        const isLegal = legalMoves.find(
-            move => move.row === row && move.col === col
-        );
-
-        if (isLegal) {
-            const move = legalMoves.find(
-                m => m.row === row && m.col === col
+            //deselect if clicked on the same square as before.
+            if (selected.row === row && selected.col === col) {
+                console.log("Unselected!")
+                setSelected(null);
+                const avElement = document.querySelectorAll('.available');
+                avElement.forEach(elem => {
+                    elem.classList.remove('available');
+                })
+                return;
+            }
+            //getMoves returns the result of one of get_Moves in moves.js
+            const legalMoves = getMoves(board, selected.row, selected.col, castlingRight);
+            console.log(legalMoves)
+            const isLegal = legalMoves.find(
+                move => move.row === row && move.col === col
             );
-            const newBoard = makeMove(board, selected, move);
-            const piece = board[selected.row][selected.col];
-            const newCastlingRights = updateCastlingRights(
-                castlingRight,
-                piece,
-                selected
-            )
-            setboard(newBoard);
-            setCastlingRight(newCastlingRights);
+
+            if (isLegal) {
+                const move = legalMoves.find(
+                    m => m.row === row && m.col === col
+                );
+                const newBoard = makeMove(board, selected, move);
+                const piece = board[selected.row][selected.col];
+                const newCastlingRights = updateCastlingRights(
+                    castlingRight,
+                    piece,
+                    selected
+                )
+                setboard(newBoard);
+                setCastlingRight(newCastlingRights);
 
             const nextTurn = turn === "white" ? "black" : "white";
             if(hasLegalMoves(newBoard, nextTurn, newCastlingRights) === false) {
@@ -227,16 +225,18 @@ const Game = () => {
                 setMethod("Checkmated!")
             }
 
-            setTurn(turn === "white" ? "black" : "white");
+                setTurn(turn === "white" ? "black" : "white");
+            }
+
+
+            setSelected(null);
+            const avElement = document.querySelectorAll('.available');
+            avElement.forEach(elem => {
+                elem.classList.remove('available');
+            })
         }
-
-
-        setSelected(null);
-        const avElement = document.querySelectorAll('.available');
-        avElement.forEach(elem => {
-            elem.classList.remove('available');
-        })
     }
+
 
 
     function handleResign() {
@@ -251,17 +251,17 @@ const Game = () => {
         setChatH((chatH) => { return [...chatH, { answer: txt, isLLMAnswer: isbot }] }) // makes chat update instant
     };
     // handle stuff because ******* react
-    async function handleBotThink(tf, ftxt=null) {
+    async function handleBotThink(tf, ftxt = null) {
         setBotThink(tf) //basicaly same thing as chat
-        if(ftxt !== null){
+        if (ftxt !== null) {
             setLoadingTxt(ftxt)
         }
     }
-    
+
     //this is for the chat
     const onSubmitChat = async (e) => {
         e.preventDefault();
-        if (playerColor !== turn) {
+        if (playerSide !== turn) {
             await handelChatUpd(chatP, false);  // chat became liiitle bit more complicated
             setPSaid(true) // is player spoken
         } else {
@@ -287,7 +287,7 @@ const Game = () => {
                         {/* Map const history */}
                     </div>
                     <div className="game-btns">
-                        {isBotThinkig ? <p>{isLoadingTxt}</p>:<button className='next-turn-btn' onClick={(() => setNextTurn(true))}>Next turn (without LLM)</button>}
+                        {isBotThinkig ? <p>{isLoadingTxt}</p> : <button className='next-turn-btn' onClick={(() => setNextTurn(true))}>Next turn (without LLM)</button>}
                         <span className='resign-btn' onClick={handleResign}>Resign ⚐</span>
                     </div>
                 </div>
@@ -314,7 +314,7 @@ const Game = () => {
 
                     <div className="chat-input">
                         <form onSubmit={onSubmitChat}>
-                            {isBotThinkig ? <p>{isLoadingTxt}</p> : <input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))} />}
+                            {isBotThinkig ? <p>Bot is thinkig OR Make a move first</p> : <input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))} />}
                             {isBotThinkig ? null : <button className="send-button">&#11127;</button>} {/*next turn button*/}
                         </form>
                     </div>
