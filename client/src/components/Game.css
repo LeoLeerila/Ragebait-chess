@@ -26,6 +26,7 @@
 
 .board-header,
 .board-footer {
+    display: flex;
     height: 2rem;
     background-color: var(--grey-colour)
 }
@@ -74,14 +75,29 @@
     font-size: 40px;
 }
 
+.mini .piece {
+    font-size: 25px;
+}
+
 .move-history {
     background-color: var(--grey-colour);
     height: 48px;
+    width: 470px;
     margin-top: 8px;
     overflow-x: auto;
     overflow-y: hidden;
     display: flex;
     align-items: center;
+}
+
+.history-row {
+    display: flex;
+    width: 75%;
+    overflow-x: auto;
+}
+
+.history-item {
+    padding: 5px;
 }
 
 /* RIGHT PANEL */
