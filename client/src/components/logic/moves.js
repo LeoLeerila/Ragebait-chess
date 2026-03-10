@@ -61,7 +61,7 @@ function getKing(board, colour) {
     return null;
 }
 
-function isInCheck(board, colour, castlingRight) {
+export function isInCheck(board, colour, castlingRight) {
     const kingPos = getKing(board, colour); //return coords of our king
 
     for (let row = 0; row < 8; row++) {
@@ -226,10 +226,6 @@ function pseudoMoves(board, row, col, castlingRight) {
 
 //purpose: check for checkmate in Game.jsx
 export function hasLegalMoves(board, colour, castlingRight) {
-    if (!isInCheck(board, colour, castlingRight)) {
-        return true;
-    }
-    let moves = [];
     for(let row = 0; row < 8; row++) {
         for(let col = 0; col < 8; col++){
             const piece = board[row][col];
@@ -241,13 +237,10 @@ export function hasLegalMoves(board, colour, castlingRight) {
             ) continue;
 
             const allMoves = getMoves(board, row, col, castlingRight)
-            allMoves.forEach(m => {
-                moves.push(m);
-            })
-            if (moves.length === 0) return false;
+            if (allMoves.length > 0) return true;
         }
     }
-    return moves;
+    return false;
 }
 
 // make the check for legal moves

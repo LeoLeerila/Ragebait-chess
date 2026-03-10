@@ -3,7 +3,7 @@ import { React, use, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
-import { getMoves, makeMove, hasLegalMoves } from './logic/moves';
+import { getMoves, makeMove, hasLegalMoves, isInCheck } from './logic/moves';
 import GameOver from './gameOver';
 import ChatTxt from "./gameChat";
 import useFetchBetter from "./hooks/useFetchBetter";
@@ -134,7 +134,7 @@ const Game = () => {
         speakSomething()
     }, [isPlayerSaid, nextTurn])
 
-    console.log(boardToFen(board, turn, castlingRight))
+    //console.log(boardToFen(board, turn, castlingRight))
 
     function updateCastlingRights(castlingRight, piece, from) {
         const rights = { ...castlingRight };
@@ -166,7 +166,7 @@ const Game = () => {
             //convert ts back to numerical coords so the code can handle it
             const { row, col } = algToCoords(square);
             const piece = board[row][col];
-            console.log("clicked on " + square + " which has piece: " + piece);
+            //console.log("clicked on " + square + " which has piece: " + piece);
 
             if (!selected) {
                 if (!piece) return;
@@ -189,7 +189,7 @@ const Game = () => {
             }
             //deselect if clicked on the same square as before.
             if (selected.row === row && selected.col === col) {
-                console.log("Unselected!")
+                //console.log("Unselected!")
                 setSelected(null);
                 const avElement = document.querySelectorAll('.available');
                 avElement.forEach(elem => {
@@ -199,7 +199,7 @@ const Game = () => {
             }
             //getMoves returns the result of one of get_Moves in moves.js
             const legalMoves = getMoves(board, selected.row, selected.col, castlingRight);
-            console.log(legalMoves)
+            //console.log(legalMoves)
             const isLegal = legalMoves.find(
                 move => move.row === row && move.col === col
             );
@@ -219,7 +219,7 @@ const Game = () => {
                 setCastlingRight(newCastlingRights);
 
             const nextTurn = turn === "white" ? "black" : "white";
-            if(hasLegalMoves(newBoard, nextTurn, newCastlingRights) === false) {
+            if(isInCheck(newBoard, nextTurn, newCastlingRights) && !hasLegalMoves(newBoard, nextTurn, newCastlingRights)) {
                 setGameOver(true);
                 setWinner(turn);
                 setMethod("Checkmated!")
