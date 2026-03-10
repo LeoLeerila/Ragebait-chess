@@ -6,6 +6,7 @@ const aiSchema = new Schema({
   aiName: {
     type: String,
     required: true,
+    unique: true
   },
   systemPrompt: {
     type: String,
@@ -15,9 +16,19 @@ const aiSchema = new Schema({
     type: String,
     required: true,
   },
-  aiELO: {
-    type: Number,
-    required: true,
+  aistats: {
+    ELO: {
+      type: Number,
+      required: true,
+    },
+    Depth: {
+      type: Number,
+      required: true,
+    },
+    Skill: {
+      type: Number,
+      required: true,
+    },
   },
   aiDescription: {
     type: String,

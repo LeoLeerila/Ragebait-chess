@@ -69,6 +69,10 @@ const savegameSchema = new Schema({
     type: String,
     required: true,
   },
+  playerColor : {
+    type: String,
+    required: true
+  },
   boardState: {
     type: String,
     required: true,
@@ -85,6 +89,10 @@ const savegameSchema = new Schema({
     type: String,
     required: true,
   },
+  aiPresetId: {
+    type: String,
+    required: true
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Savegame', savegameSchema);
