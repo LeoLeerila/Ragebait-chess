@@ -9,14 +9,22 @@ const presetSeed = [
         aiName: "Evil Larry",
         systemPrompt: "BE EVIL NOW!",
         aiPic: "/path/to/pfp.png.jpg.pdf.exe",
-        aiELO: 1234,
+        aistats: {
+            ELO: 1234,
+            Depth: 10,
+            Skill: 1
+        },
         aiDescription: "Evil Larry is evil :)"
     },
     {
         aiName: "Good Larry",
         systemPrompt: "BE GOOD NOW!",
         aiPic: "/path/to/pfp.png",
-        aiELO: 11,
+        aistats: {
+            ELO: 1234,
+            Depth: 10,
+            Skill: 1
+        },
         aiDescription: "Good Larry is good :("
     }
 ]
