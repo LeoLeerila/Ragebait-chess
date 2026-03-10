@@ -18,7 +18,7 @@ return user && user.token ? true:false});
       <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
       <div className="content">
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} />
         <Route path="/register" element={isAuthenticated ? (<Navigate to="/" />) : (<RegisterForm setIsAuthenticated={setIsAuthenticated} />)} />
         <Route path="/login" element={isAuthenticated ? (<Navigate to="/" />) : (<LoginForm setIsAuthenticated={setIsAuthenticated} />)} />
         <Route path="/start" element={isAuthenticated ? <GameStart /> : <Navigate to="/login" />} />
