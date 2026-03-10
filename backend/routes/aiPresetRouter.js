@@ -3,9 +3,9 @@ const router = express.Router();
 const {
   getAllAiPresets,
   getAiPresetById,
-  createAiPreset,
-  updateAiPreset,
-  deleteAiPreset,
+  //createAiPreset,
+  //updateAiPreset,
+  //deleteAiPreset,
   // patchAiPreset
 } = require("../controllers/aiPresetControllers");
  
@@ -13,16 +13,16 @@ const {
 router.get("/", getAllAiPresets);
 
 // POST /aiPresets
-router.post("/", createAiPreset); // create new aipreset
+//router.post("/", createAiPreset); // create new aipreset
 
 // GET /aiPresets/:aiPresetId
 router.get("/:aiPresetId", getAiPresetById);
 
 // PUT /aiPresets/:aiPresetId
-router.put("/:aiPresetId", updateAiPreset);
+//router.put("/:aiPresetId", updateAiPreset);
 
 // DELETE /aiPresets/:aiPresetId
-router.delete("/:aiPresetId", deleteAiPreset);
+//router.delete("/:aiPresetId", deleteAiPreset);
 
 // Update aiPreset using PATCH 
 // router.patch('/:aiPresetId', patchAiPreset)
