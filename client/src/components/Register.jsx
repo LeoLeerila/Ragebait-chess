@@ -8,6 +8,7 @@ function RegisterForm({ setIsAuthenticated }) {
     //state object
     const { fetchData, isLoading, error } = useFetchBetter(`api`);
     const [form, setForm] = useState({ displayname: "", email: "", password: "", confirmPassword: "" });
+    const [localError, setLocalError] = useState(null)
     //updates correct field upon typing
     function handleChange(event) {
         setForm({...form, [event.target.name]: event.target.value});
@@ -18,9 +19,9 @@ function RegisterForm({ setIsAuthenticated }) {
         event.preventDefault();
         //very simple check if passwords match
         //should also maybe make some kind of notification if email is not a properly formatted email. input type="email" sort of takes care of this but doesn't actually give any kind of indication besides not allowing the submission of the form.
+        setLocalError(null);
         if (form.password !== form.confirmPassword) {
-        //this alert should probably be changed to something better looking later on
-        alert("Passwords do not match");
+            setLocalError("Passwords do not match");
         return;
         }
         const data = await fetchData("/player/signup", "POST", null, {
@@ -41,6 +42,7 @@ function RegisterForm({ setIsAuthenticated }) {
         <div className="register-container">
             <form className="input-section" onSubmit={handleSubmit}>
                 <h1>Register to begin playing!</h1>
+                {localError || error && <p className="error-message">{localError || error}</p>}
                 <input
                 type="text"
                 name="displayname"
