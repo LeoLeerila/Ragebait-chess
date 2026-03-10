@@ -38,7 +38,7 @@ const Game = () => {
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
-    const [evaluate, setEval] = useState(null);
+    const [evaluate, setEval] = useState(10.0); //floati use this for the eval bar like %, i would do but i don't wanna touch css.
     const [saveGameId, setSaveGameId] = useState(null);
 
     //Goodbye chat
@@ -79,7 +79,6 @@ const Game = () => {
                 setSaveGameId(saveGame._id)
             } else {
                 const savedGame = await fetchData(`/savegame/${selectGame}`, "GET", token)
-                console.log(savedGame)
                 setboard(JSON.parse(savedGame.board))
                 setTurn(savedGame.boardState)
                 setHistory(JSON.parse(savedGame.moveHistory))
@@ -95,9 +94,7 @@ const Game = () => {
         if (playerSide !== turn) {
             setChatP("") //clear chat
             handleBotThink(true) //self explanatory. it works, trust me
-
             stockfish.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`);
-            console.log(`go depth ${opponent.aistats?.Depth} Skill Level ${opponent.aistats?.Skill}`)
             stockfish.postMessage(`go depth ${opponent.aistats?.Depth} Skill Level ${opponent.aistats?.Skill} movetime 10000`);
             stockfish.onmessage = (e) => {
                 let data = e.data
@@ -108,19 +105,15 @@ const Game = () => {
                     setBestMove(data)
                     handleBotThink(false)   
                     stockfish.terminate() // Exterminate!, Exterminate!, Exterminate!, Exterminate!
-
                 }
             }
         };
-
-
+        updEval()
         if (saveGameId !== null){
             fetchData(`/savegame/${saveGameId}`, "PATCH", token, { playerColor: playerSide, boardState: turn, moveHistory: JSON.stringify(history), board: JSON.stringify(board), chatHistory: JSON.stringify(chatH), aiPresetId: aiId })
         }else{
             console.log("SaveGameId is null, something went wrong somewhere, don't ask idk")
         }
-        
-        
     }, [turn])
 
     useEffect(() => {
@@ -128,7 +121,6 @@ const Game = () => {
             handleBotThink(true, "Bot is thinkig")
             if (playerSide !== turn) {
                 if (isPlayerSaid) {
-
                     //do here the uhh the that uhh thing ... the bot
                     //this makes the fetch to backend and that then goes to LLM
                     const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
@@ -142,7 +134,6 @@ const Game = () => {
                         playerAns: chatP,
                         playerMove: "Needs to be added"
                     })
-                    console.log(data)
                     await handelChatUpd(data.data.answer, true); // update chat
                 };
 
@@ -192,6 +183,26 @@ const Game = () => {
         handleBotThink(false)
         speakSomething()
     }, [isPlayerSaid, nextTurn])
+
+    function updEval(){
+        const stockfishEval = new Worker("./stockfish-18-single.js"); // this gets you personal eval to see how shi.. good you play
+        stockfishEval.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`); // there is board to fen, but no fen to board
+        stockfishEval.postMessage(`eval`);
+        stockfishEval.onmessage = (e) =>{
+            let data = e.data
+            if(data.includes("Final")){
+                const numbr = data.split(" ")[8] // hard coded stuff takes Final something => float, hmm i seem doing lot of data manipulation
+                const numbre = parseFloat(numbr.slice(1)) // i wanted to do this on same line but nooooo, i need the + or some other shit
+                if(numbr.includes("+")){ //there is def better way, buuuuuut i don't care.
+                    setEval(evaluate + numbre) // this is some genius level math
+                }else{
+                    setEval(evaluate - numbre)
+                }
+                stockfishEval.terminate() // i will be back
+            }
+        }
+        
+    }
 
     //console.log(boardToFen(board, turn, castlingRight))
     //piece and move must come in the alg form to not be confusing lmao 
