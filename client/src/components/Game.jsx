@@ -83,7 +83,7 @@ const Game = () => {
             const stockfish = new Worker("./stockfish-18-single.js");
             const DEPTH = 10; // number of halfmoves the engine looks ahead, in future i think LLM will decide from ready made options like min 5, max 10
             stockfish.postMessage("uci");
-            stockfish.postMessage(`position fen ${boardToFen(board, turn)}`);
+            stockfish.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`);
             stockfish.postMessage(`go depth ${DEPTH}`);
 
             stockfish.onmessage = (e) => {
@@ -107,7 +107,7 @@ const Game = () => {
                     //this makes the fetch to backend and that then goes to LLM
                     const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
                         botBoard: {
-                            fen: boardToFen(board, turn),
+                            fen: boardToFen(board, turn, castlingRight),
                             currentMoves: bestMove,
                             history: chatH,
                             botChessC: "BLACK"
