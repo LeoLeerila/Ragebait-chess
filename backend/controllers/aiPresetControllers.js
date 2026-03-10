@@ -11,6 +11,7 @@ const getAllAiPresets = async (req, res) => {
   }
 };
  
+/* 
 // POST /aiPresets
 const createAiPreset = async (req, res) => {
   try {
@@ -20,6 +21,7 @@ const createAiPreset = async (req, res) => {
     res.status(400).json({ message: "Failed to create aiPreset", error: error.message });
   }
 };
+ */
 
 // GET /aiPresets/:aiPresetId
 const getAiPresetById = async (req, res) => {
@@ -41,6 +43,7 @@ const getAiPresetById = async (req, res) => {
   }
 };
 
+/* 
 // PUT /aiPresets/:aiPresetId
 const updateAiPreset = async (req, res) => {
   const { aiPresetId } = req.params;
@@ -64,7 +67,9 @@ const updateAiPreset = async (req, res) => {
     res.status(500).json({ message: "Failed to update aiPreset" });
   }
 };
+ */
 
+/* 
 // DELETE /aiPresets/:aiPresetId
 const deleteAiPreset = async (req, res) => {
   const { aiPresetId } = req.params;
@@ -84,12 +89,13 @@ const deleteAiPreset = async (req, res) => {
     res.status(500).json({ message: "Failed to delete aiPreset" });
   }
 };
+ */
 
 module.exports = {
   getAllAiPresets,
   getAiPresetById,
-  createAiPreset,
-  updateAiPreset,
-  deleteAiPreset,
+  //createAiPreset,
+  //updateAiPreset,
+  //deleteAiPreset,
 };
 
