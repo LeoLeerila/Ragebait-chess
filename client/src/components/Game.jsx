@@ -3,7 +3,7 @@ import { React, use, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
-import { getMoves, makeMove } from './logic/moves';
+import { getMoves, makeMove, hasLegalMoves, isInCheck } from './logic/moves';
 import GameOver from './gameOver';
 import ChatTxt from "./gameChat";
 import useFetchBetter from "./hooks/useFetchBetter";
@@ -32,6 +32,8 @@ const Game = () => {
         q: true
     })
     const [turn, setTurn] = useState("white");
+    const [capturedWhite, setCapturedWhite] = useState([]);
+    const [capturedBlack, setCapturedBlack] = useState([]);
     const [selected, setSelected] = useState(null);
     const [history, setHistory] = useState([]);
     const [gameOver, setGameOver] = useState(false);
@@ -122,9 +124,38 @@ const Game = () => {
 
                 const start = bestMove.slice(0, 2)
                 const end = bestMove.slice(2)
+                //console.log(algToCoords(end))
+                const botStart = algToCoords(start)
+                const botMove = algToCoords(end)
+                const capturedPiece = board[botMove.row][botMove.col];
+                if (capturedPiece) {
+                    console.log("HEELPPP. HEELPP MEEE!!!! -", board[botMove.row][botMove.col])
+                    if (capturedPiece === capturedPiece.toUpperCase()) {
+                        setCapturedWhite(capturedPiece)
+                    } else {
+                        setCapturedBlack(capturedPiece)
+                    }
+                }
 
                 const newBoard = makeMove(board, algToCoords(start), algToCoords(end));
                 setboard(newBoard);
+                const piece = board[botStart.row][botStart.col];
+                //console.log(piece)
+                const newCastlingRights = updateCastlingRights(
+                    castlingRight,
+                    piece,
+                    botStart
+                )
+                setCastlingRight(newCastlingRights);
+
+                const nextTurn = turn === "white" ? "black" : "white";
+                if (isInCheck(newBoard, nextTurn, newCastlingRights) && !hasLegalMoves(newBoard, nextTurn, newCastlingRights)) {
+                    console.log("RAHHHHHH")
+                    setGameOver(true);
+                    setWinner(turn);
+                    setMethod("Checkmated!")
+                }
+                
                 setTurn(turn === "white" ? "black" : "white");
 
                 setNextTurn(false)
@@ -136,7 +167,7 @@ const Game = () => {
         speakSomething()
     }, [isPlayerSaid, nextTurn])
 
-    console.log(boardToFen(board, turn, castlingRight))
+    //console.log(boardToFen(board, turn, castlingRight))
 
     function updateCastlingRights(castlingRight, piece, from) {
         const rights = { ...castlingRight };
@@ -168,7 +199,7 @@ const Game = () => {
             //convert ts back to numerical coords so the code can handle it
             const { row, col } = algToCoords(square);
             const piece = board[row][col];
-            console.log("clicked on " + square + " which has piece: " + piece);
+            //console.log("clicked on " + square + " which has piece: " + piece);
 
             if (!selected) {
                 if (!piece) return;
@@ -191,7 +222,7 @@ const Game = () => {
             }
             //deselect if clicked on the same square as before.
             if (selected.row === row && selected.col === col) {
-                console.log("Unselected!")
+                //console.log("Unselected!")
                 setSelected(null);
                 const avElement = document.querySelectorAll('.available');
                 avElement.forEach(elem => {
@@ -201,7 +232,7 @@ const Game = () => {
             }
             //getMoves returns the result of one of get_Moves in moves.js
             const legalMoves = getMoves(board, selected.row, selected.col, castlingRight);
-            console.log(legalMoves)
+            //console.log(legalMoves)
             const isLegal = legalMoves.find(
                 move => move.row === row && move.col === col
             );
@@ -210,8 +241,20 @@ const Game = () => {
                 const move = legalMoves.find(
                     m => m.row === row && m.col === col
                 );
+                //check if there's apiece where we're abt to move
+                const capturedPiece = board[move.row][move.col];
+                if (capturedPiece) {
+                    console.log("HEELPPP. HEELPP MEEE!!!! -", board[move.row][move.col])
+                    if (capturedPiece === capturedPiece.toUpperCase()) {
+                        setCapturedWhite(capturedPiece)
+                    } else {
+                        setCapturedBlack(capturedPiece)
+                    }
+                }
+
                 const newBoard = makeMove(board, selected, move);
                 const piece = board[selected.row][selected.col];
+                console.log(piece)
                 const newCastlingRights = updateCastlingRights(
                     castlingRight,
                     piece,
@@ -219,6 +262,14 @@ const Game = () => {
                 )
                 setboard(newBoard);
                 setCastlingRight(newCastlingRights);
+
+                const nextTurn = turn === "white" ? "black" : "white";
+                if (isInCheck(newBoard, nextTurn, newCastlingRights) && !hasLegalMoves(newBoard, nextTurn, newCastlingRights)) {
+                    setGameOver(true);
+                    setWinner(turn);
+                    setMethod("Checkmated!")
+                }
+
                 setTurn(turn === "white" ? "black" : "white");
             }
 
@@ -269,7 +320,7 @@ const Game = () => {
                 <div className="board-wrapper">
                     <div className="board-header"></div>
                     <div className="chess-board">
-                        <Chessboard board={board} squareClick={handleSquareClick} selected={selected} />
+                        <Chessboard board={board} squareClick={handleSquareClick} selected={selected} playAsBlack={playerSide} />
                     </div>
                     <div className="board-footer"></div>
                 </div>
