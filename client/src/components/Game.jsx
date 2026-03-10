@@ -12,6 +12,7 @@ import useFetchBetter from "./hooks/useFetchBetter";
 
 //these are dummydata for use before database
 import { algToCoords, coordsToAlg, boardToFen } from './logic/helps';
+import Piece from './Piece';
 
 const Game = () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -132,15 +133,16 @@ const Game = () => {
                 if (capturedPiece) {
                     console.log("HEELPPP. HEELPP MEEE!!!! -", board[botMove.row][botMove.col])
                     if (capturedPiece === capturedPiece.toUpperCase()) {
-                        setCapturedWhite(capturedPiece)
+                        setCapturedWhite(prev => [...prev, capturedPiece])
                     } else {
-                        setCapturedBlack(capturedPiece)
+                        setCapturedBlack(prev => [...prev, capturedPiece])
                     }
                 }
 
                 const newBoard = makeMove(board, algToCoords(start), algToCoords(end));
                 setboard(newBoard);
                 const piece = board[botStart.row][botStart.col];
+                trackHistory(piece, end);
                 //console.log(piece)
                 const newCastlingRights = updateCastlingRights(
                     castlingRight,
@@ -156,7 +158,7 @@ const Game = () => {
                     setWinner(turn);
                     setMethod("Checkmated!")
                 }
-                
+
                 setTurn(turn === "white" ? "black" : "white");
 
                 setNextTurn(false)
@@ -169,6 +171,17 @@ const Game = () => {
     }, [isPlayerSaid, nextTurn])
 
     //console.log(boardToFen(board, turn, castlingRight))
+    //piece and move must come in the alg form to not be confusing lmao 
+    function trackHistory(piece, move) {
+        console.log(piece, move)
+        if(piece==="P" || piece==="p") {
+            setHistory(prev => [...prev, move])
+        } else {
+            let occurence = `${piece}${move}`;
+            setHistory(prev => [...prev, occurence])
+        }
+        console.log(history)
+    }
 
     function updateCastlingRights(castlingRight, piece, from) {
         const rights = { ...castlingRight };
@@ -247,14 +260,16 @@ const Game = () => {
                 if (capturedPiece) {
                     console.log("HEELPPP. HEELPP MEEE!!!! -", board[move.row][move.col])
                     if (capturedPiece === capturedPiece.toUpperCase()) {
-                        setCapturedWhite(capturedPiece)
+                        setCapturedWhite(prev => [...prev, capturedPiece])
                     } else {
-                        setCapturedBlack(capturedPiece)
+                        setCapturedBlack(prev => [...prev, capturedPiece])
                     }
+                    console.log(capturedPiece)
                 }
 
                 const newBoard = makeMove(board, selected, move);
                 const piece = board[selected.row][selected.col];
+                trackHistory(piece, square);
                 console.log(piece)
                 const newCastlingRights = updateCastlingRights(
                     castlingRight,
@@ -319,15 +334,29 @@ const Game = () => {
             {/* GAME BOARD AND DISCARDED PIECES */}
             <div className="main-layout">
                 <div className="board-wrapper">
-                    <div className="board-header"></div>
+                    <div className="board-header">
+                        {(playerSide === "white" ? capturedWhite : capturedBlack).map((p, i) => (
+                            <div key={i} className="mini">
+                                <Piece key={i} piece={p} />
+                            </div>
+                        ))}
+                    </div>
                     <div className="chess-board">
                         <Chessboard board={board} squareClick={handleSquareClick} selected={selected} playAsBlack={playerSide} />
                     </div>
-                    <div className="board-footer"></div>
+                    <div className="board-footer">
+                        {(playerSide === "white" ? capturedBlack : capturedWhite).map((p, i) => (
+                            <div key={i} className="mini">
+                                <Piece key={i} piece={p} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
                 <div className="move-history">
                     <div className="history-row">
-                        {/* Map const history */}
+                        {history.map((occurence, i) => (
+                            <span className="history-item">{` ${i + 1}.${occurence}`} </span>
+                        ))}
                     </div>
                     <div className="game-btns">
                         {isBotThinkig ? <p>Bot is thinkig OR Make a move first</p> : <button className='next-turn-btn' onClick={(() => setNextTurn(true))}>Next turn (without LLM)</button>}
