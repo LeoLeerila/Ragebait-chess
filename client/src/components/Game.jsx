@@ -20,7 +20,8 @@ const Game = () => {
     //useLocation: get the shit from gameStart.jsx through 'state'
     const navigate = useNavigate();
     const location = useLocation();
-    const { opponent, playerSide, godmode } = location.state || {};
+    const { aiId, playerSide, godmode } = location.state || {};
+    
 
     //setting up the game
     const [board, setboard] = useState(initBoard);
@@ -41,14 +42,13 @@ const Game = () => {
     //Chat states
     const [chatH, setChatH] = useState([]); // [{Answer: "Greetings type to type here or something like that", isLLMAnswer: true},{Answer: "Greetings", isLLMAnswer: false}] 
     const [chatP, setChatP] = useState("");
-    const [isLoadingTxt, setLoadingTxt] = useState("Make a move first")
 
     // custom hook to fetch stuff
     const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`);
     const [playerD, setPlayerD] = useState({});
     const [settingsD, setSettingsD] = useState({});
     const [statsD, setStatsD] = useState({});
-    //here later will be also aipreset
+    const [opponent, setOpponent] = useState({});
 
     //stockfish
     const [isBotThinkig, setBotThink] = useState(isLoading);
@@ -56,16 +56,16 @@ const Game = () => {
     const [bestMove, setBestMove] = useState("");
     const [nextTurn, setNextTurn] = useState(false);
 
-
+    //useEffect wall
     // This load player info
     useEffect(() => {
         const fetchStuff = async () => {
             const playerData = await fetchData('/player/', "GET", token)
             const statsData = await fetchData('/stats/', "GET", token)
             const settingsData = await fetchData('/settings/', "GET", token)
+            const opponentData = await fetchData(`/aiPreset/${aiId}`)
 
-            //Do here also the Ai preset
-
+            setOpponent(opponentData);
             setPlayerD(playerData);
             setStatsD(statsData);
             setSettingsD(settingsData);
@@ -73,27 +73,28 @@ const Game = () => {
         fetchStuff()
     }, [])
 
-    //i dont really know what the hell am doing -oleruu
+    //i dont really know what the hell am doing, but it just works -oleruu
     useEffect(() => {
+        const stockfish = new Worker("./stockfish-18-single.js");
         if (playerSide !== turn) {
             setChatP("") //clear chat
             handleBotThink(true) //self explanatory. it works, trust me
-            const stockfish = new Worker("./stockfish-18-single.js");
-            const DEPTH = 10; // number of halfmoves the engine looks ahead, in future i think LLM will decide from ready made options like min 5, max 10
-            stockfish.postMessage("uci");
+            
             stockfish.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`);
-            stockfish.postMessage(`go depth ${DEPTH}`);
-
+            stockfish.postMessage(`go depth ${opponent.aistats?.depth} Skill Level ${opponent.aistats?.skill}`);
             stockfish.onmessage = (e) => {
                 let data = e.data
+                console.log(data)
                 if (data.includes("bestmove")) {
                     data = data.split(" ")[1] //makes "bestmove c7c6 ponder b5a4" => "c7c6"
                     console.log(data)
                     setBestMove(data)
                     handleBotThink(false)
+                    stockfish.terminate() // Exterminate!, Exterminate!, Exterminate!, Exterminate!
                 }
             }
         };
+
     }, [turn])
 
     useEffect(() => {
@@ -101,6 +102,7 @@ const Game = () => {
             handleBotThink(true, "Bot is thinkig")
             if (playerSide !== turn) {
                 if (isPlayerSaid) {
+                    
                     //do here the uhh the that uhh thing ... the bot
                     //this makes the fetch to backend and that then goes to LLM
                     const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
@@ -238,16 +240,13 @@ const Game = () => {
         setMethod("resignation");
     }
 
-    // handle stuf, because react
+    // handle stuff, because react
     async function handelChatUpd(txt, isbot) {
         setChatH((chatH) => { return [...chatH, { answer: txt, isLLMAnswer: isbot }] }) // makes chat update instant
     };
     // handle stuff because ******* react
-    async function handleBotThink(tf, ftxt = null) {
+    async function handleBotThink(tf) {
         setBotThink(tf) //basicaly same thing as chat
-        if (ftxt !== null) {
-            setLoadingTxt(ftxt)
-        }
     }
 
     //this is for the chat
@@ -279,7 +278,7 @@ const Game = () => {
                         {/* Map const history */}
                     </div>
                     <div className="game-btns">
-                        {isBotThinkig ? <p>{isLoadingTxt}</p> : <button className='next-turn-btn' onClick={(() => setNextTurn(true))}>Next turn (without LLM)</button>}
+                        {isBotThinkig ? <p>Bot is thinkig OR Make a move first</p> : <button className='next-turn-btn' onClick={(() => setNextTurn(true))}>Next turn (without LLM)</button>}
                         <span className='resign-btn' onClick={handleResign}>Resign ⚐</span>
                     </div>
                 </div>
@@ -291,11 +290,11 @@ const Game = () => {
                     {/* Top player, map the opponent details.*/}
                     <div className="player-card top-player">
                         <div className="avatar">
-                            <img src={opponent.AIPic} alt={opponent.AIName} />
+                            <img src={opponent.aiPic} alt={opponent.aiName} />
                         </div>
                         <div className="player-info">
-                            <div className="player-name">{opponent.AIName}</div>
-                            <div className="player-rating">{opponent.AIElo}</div>
+                            <div className="player-name">{opponent.aiName}</div>
+                            <div className="player-rating">{opponent.aistats?.ELO}</div>
                         </div>
                     </div>
 

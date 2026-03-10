@@ -1,14 +1,25 @@
 import './gameStart.css'
 import Bot from './BotComponent';
-import { bots } from '../assets/bot-placeholder'
-import { React, useState } from 'react'
+import { React, useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
+import useFetchBetter from "./hooks/useFetchBetter";
+
 //get BOT LIST data
 
 const GameStart = () => {
     const [formError, setFormError] = useState("");
     const [playerSide, setPlayerSide] = useState(null);
     const [godmode, setGodmode] = useState(false);
+    const [bots, setBots] = useState([])
+    const{fetchData, isLoading, error} = useFetchBetter(`http://localhost:4000/api`)
+
+    useEffect(()=>{
+        const fetchStuff = async () => {
+            const data = await fetchData("/aiPreset/")
+            setBots(data)
+        }
+        fetchStuff()
+    },[])
 
     const navigate = useNavigate();
     const moveToGame = (e) => {
@@ -20,7 +31,7 @@ const GameStart = () => {
         setFormError("");
         navigate('/game', { 
             state: { 
-                opponent: selectOpponent,
+                aiId: selectOpponent._id,
                 playerSide,
                 godmode 
             } 
@@ -31,6 +42,7 @@ const GameStart = () => {
     const handleSelect = (bot) => {
         setSelectOpponent(bot);
     }
+
     return (
         <div className="game-start-base">
             <div className="top-searchBar">
@@ -47,17 +59,17 @@ const GameStart = () => {
             <form className="bottom-opts" onSubmit={moveToGame}>
                 <ul className="bot-output">
                     {bots.map((bot) => {
-                        return <Bot key={bot.id} bot={bot} onSelect={handleSelect} />
+                        return <Bot key={bot._id} bot={bot} onSelect={handleSelect} />
                     })}
                 </ul>
                 <div className="bottom-colmn">
                     <div className="bot-profile">
                         {selectOpponent && (
                             <section>
-                                <img src={selectOpponent.AIPic} alt="profile picture" />
-                                <h4>{selectOpponent.AIName}</h4>
-                                <p className="bot-info">{selectOpponent.info}</p>
-                                <p className="bot-elo">{selectOpponent.AIElo}</p>
+                                <img src={selectOpponent.aiPic} alt="profile picture" />
+                                <h4>{selectOpponent.aiName}</h4>
+                                <p className="bot-info">{selectOpponent.aiDescription}</p>
+                                <p className="bot-elo">{selectOpponent.aistats.ELO}</p>
                             </section>)}
                     </div>
                     <div className="options">
