@@ -1,17 +1,22 @@
 import './Game.css'
-import { React, useEffect, useState } from 'react'
+import { React, use, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
 import { getMoves, makeMove } from './logic/moves';
 import GameOver from './gameOver';
 import ChatTxt from "./gameChat";
+import useFetchBetter from "./hooks/useFetchBetter";
+
+// import useFish from './hooks/useFish';
 
 //these are dummydata for use before database
-import { RawPlayerData, RawSettings, RawStats } from "../assets/dummydata";
 import { algToCoords, coordsToAlg, boardToFen } from './logic/helps';
 
 const Game = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user ? user.token : null;
+
     //useLocation: get the shit from gameStart.jsx through 'state'
     const navigate = useNavigate();
     const location = useLocation();
@@ -26,33 +31,107 @@ const Game = () => {
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
 
+    const [playerColor, setPlayerColor] = useState("white");
+    
     //Goodbye chat
     //Chat states
-    const [chatH, setChatH] = useState([{ctxt:"Greetings type to type here or something like that", isbot:true}]);
+    const [chatH, setChatH] = useState([]); // [{Answer: "Greetings type to type here or something like that", isLLMAnswer: true},{Answer: "Greetings", isLLMAnswer: false}] 
     const [chatP, setChatP] = useState("");
-    
-    //semi temporary, needs to be changed after db
-    const [PlayerD, setPlayer] = useState(RawPlayerData);
-    const [SettingsD, setSettings] = useState(RawSettings);
-    const [StatsD, setStats] = useState(RawStats);
-    console.log(boardToFen(board, turn))
-    //this is temporary, when database is working it will use different method
-    let PlayerId = "4" //temp to change player in chatbox
-    let t_PlayerId = ""
-    let pFound = false
-    for (let i = 0; i < RawPlayerData.length;) {
-        if (RawPlayerData[i].PlayerId === PlayerId) {
-            t_PlayerId = i;
-            pFound = true;
-            break
-        } else {
-            i++;
+    const [isLoadingTxt, setLoadingTxt] = useState("Make a move first")
+
+    // custom hook to fetch stuff
+    const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`);
+    const [playerD, setPlayerD] = useState({});
+    const [settingsD, setSettingsD] = useState({});
+    const [statsD, setStatsD] = useState({});
+    //here later will be also aipreset
+
+    //stockfish
+    const [isBotThinkig, setBotThink] = useState(isLoading);
+    const [isPlayerSaid, setPSaid] = useState(false);
+    const [bestMove, setBestMove] = useState("");
+    const [nextTurn, setNextTurn] = useState(false);
+
+
+    // This load player info
+    useEffect(() => {
+        const fetchStuff = async () => {
+            const playerData = await fetchData('/player/', "GET", token)
+            const statsData = await fetchData('/stats/', "GET", token)
+            const settingsData = await fetchData('/settings/', "GET", token)
+
+            //Do here also the Ai preset
+
+            setPlayerD(playerData);
+            setStatsD(statsData);
+            setSettingsD(settingsData);
         }
-    };
-    //it will throw alert when data not found in dummydata file
-    if (!pFound) {
-        alert("player data not found")
-    };
+        fetchStuff()
+    }, [])
+
+    //i dont really know what the hell am doing -oleruu
+    useEffect(() => {
+        if (playerColor !== turn) {
+            setChatP("") //clear chat
+            handleBotThink(true, "Bot is thinkig") //self explanatory
+            const stockfish = new Worker("./stockfish-18-single.js");
+            const DEPTH = 10; // number of halfmoves the engine looks ahead, in future i think LLM will decide from ready made options like min 5, max 10
+            stockfish.postMessage("uci");
+            stockfish.postMessage(`position fen ${boardToFen(board, turn)}`);
+            stockfish.postMessage(`go depth ${DEPTH}`);
+
+            stockfish.onmessage = (e) => {
+                let data = e.data
+                if (data.includes("bestmove")) {
+                    data = data.split(" ")[1] //makes "bestmove c7c6 ponder b5a4" => "c7c6"
+                    console.log(data)
+                    setBestMove(data)
+                    handleBotThink(false, "Make a move first")
+                }
+            }
+        };
+    }, [turn])
+
+    useEffect(() => {
+        const speakSomething = async () => {
+            handleBotThink(true, "Bot is thinkig")
+            if (playerColor !== turn) {
+                if (isPlayerSaid) {
+                    //do here the uhh the that uhh thing ... the bot
+                    //this makes the fetch to backend and that then goes to LLM
+                    const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
+                        botBoard: {
+                            fen: boardToFen(board, turn),
+                            currentMoves: bestMove,
+                            history: chatH,
+                            botChessC: "BLACK"
+                        },
+                        botPreset: {AiName:"Evil Larry",info: "A temperamental, evil cat overlord known as Larry.",botElo: "1200"},
+                        playerAns: chatP,
+                        playerMove: "Needs to be added"
+                    })
+                    console.log(data)
+                    await handelChatUpd(data.data.answer, true); // update chat
+                };
+                
+                const start = bestMove.slice(0, 2)
+                const end = bestMove.slice(2)
+
+                const newBoard = makeMove(board, algToCoords(start),algToCoords(end));
+                setboard(newBoard);
+                setTurn(turn === "white" ? "black" : "white");
+
+                setNextTurn(false)
+                setChatP("") //clear
+                setPSaid(false) //is player spoken
+            }
+        }
+        handleBotThink(false, "Make a move first")
+        speakSomething()
+    }, [isPlayerSaid, nextTurn])
+
+
+    console.log(boardToFen(board, turn))
 
     //CODE DUMP ALERT: GAME MECHANICS YIPPEE
     function handleSquareClick(square) {
@@ -116,70 +195,33 @@ const Game = () => {
         setMethod("resignation");
     }
 
-
+    // handle stuf, because react
     async function handelChatUpd(txt, isbot) {
-        console.log(chatH)
-        setChatH((chatH)=> { return [...chatH,{ctxt:txt,isbot:isbot}]})
+        setChatH((chatH) => { return [...chatH, { answer: txt, isLLMAnswer: isbot }] }) // makes chat update instant
     };
-
-    //this is for the chat
-    const onSubmitChat = async (e) =>{
-        e.preventDefault();
-
-        await handelChatUpd(chatP, false);
-        
-        console.log(chatH)
-
-        //do here the uhh the that uhh thing ... the bot
-
-        //going to be something like this
-        /*
-        const newData = {
-            fen:,
-            currentMoves:,
-            history:,
-            blockedPieces:,
-            playerAns:,
-        };
-        */
-
-        //temp
-        const newData = {
-            playerAns:chatP,
-            history:chatH
-        };
-        
-        setChatP("")
-         try {
-
-            const res = await fetch('http://localhost:4000/api/ai/generate-nxt-move', {
-            method: "POST",
-            body: JSON.stringify(newData),
-            headers:{
-                'Content-Type': 'application/json',
-                },
-            });
-            console.log(res)
-            
-            const data = await res.json();
-            if(!res.ok){
-                console.log("Failed in bot", data, res.body, newData)
-                return
-            }
-            await handelChatUpd(data.data, true);
-
-            
-            
-        } catch (error) {
-            console.log("Error in speaking with bot:", error);
+    // handle stuff because ******* react
+    async function handleBotThink(tf, ftxt=null) {
+        setBotThink(tf) //basicaly same thing as chat
+        if(ftxt !== null){
+            setLoadingTxt(ftxt)
         }
-        
-        
+    }
+    
+    //this is for the chat
+    const onSubmitChat = async (e) => {
+        e.preventDefault();
+        if (playerColor !== turn) {
+            await handelChatUpd(chatP, false);  // chat became liiitle bit more complicated
+            setPSaid(true) // is player spoken
+        } else {
+            setChatP("Make a move first!") //if stockfish calc not ready sets player txt to this
+        }
 
     };
+
 
     return (
-        <div className="game-base">
+        <div className="game-base" >
             {/* GAME BOARD AND DISCARDED PIECES */}
             <div className="main-layout">
                 <div className="board-wrapper">
@@ -194,6 +236,7 @@ const Game = () => {
                         {/* Map const history */}
                     </div>
                     <div className="game-btns">
+                        {isBotThinkig ? <p>{isLoadingTxt}</p>:<button className='next-turn-btn' onClick={(() => setNextTurn(true))}>Next turn (without LLM)</button>}
                         <span className='resign-btn' onClick={handleResign}>Resign ⚐</span>
                     </div>
                 </div>
@@ -215,24 +258,24 @@ const Game = () => {
 
                     {/* Map chat history, *TEMPORARY CODE* (permament) */}
                     <div className="chat-window">
-                        {chatH.map((chat, i) => <ChatTxt key={i} chat={chat}/>)}
+                        {chatH.map((chat, i) => <ChatTxt key={i} chat={chat} />)}
                     </div>
 
                     <div className="chat-input">
                         <form onSubmit={onSubmitChat}>
-                            <input type="text" value={chatP} onChange={((e)=>setChatP(e.target.value))} />
-                            <button className="send-button">&#11127;</button>
+                            {isBotThinkig ? <p>{isLoadingTxt}</p> : <input type="text" value={chatP} onChange={((e) => setChatP(e.target.value))} />}
+                            {isBotThinkig ? null : <button className="send-button">&#11127;</button>} {/*next turn button*/}
                         </form>
                     </div>
 
                     {/* Bottom player, map the user data*/}
                     <div className="player-card bottom-player">
                         <div className="avatar">
-                            <img src={SettingsD[t_PlayerId].ProfilePic} />
+                            <img src={settingsD.ProfilePic} />
                         </div>
                         <div className="player-info">
-                            <div className="player-name">{PlayerD[t_PlayerId].Name}</div>
-                            <div className="player-rating">{StatsD[t_PlayerId].CurrentELO} ELO</div>
+                            <div className="player-name">{playerD.playerName}</div>
+                            <div className="player-rating">{statsD.currentELO} ELO</div>
                         </div>
                         <div className="player-icon"></div>
                     </div>

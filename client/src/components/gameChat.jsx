@@ -1,8 +1,7 @@
 function ChatTxt({chat}){
-
     return(
         <div>
-            {chat.isbot ? <div className="message opponent"><div className="bubble"><p>{chat.ctxt}</p></div></div>:<div className="message user"><div className="bubble" ><p>{chat.ctxt}</p></div></div>}
+            {chat.isLLMAnswer ? <div className="message opponent"><div className="bubble"><p>{chat.answer}</p></div></div>:<div className="message user"><div className="bubble" ><p>{chat.answer}</p></div></div>}
         </div>
     );
 };

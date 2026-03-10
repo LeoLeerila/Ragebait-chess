@@ -19,7 +19,7 @@ function Header({ isAuthenticated, setIsAuthenticated}) {
             <div className="header-buttons">
             {isAuthenticated && (
                 <>
-                <Link to="/user" className="header-btn">User</Link>
+                <Link to="/user/:PlayerId" className="header-btn">User</Link>
                 <button onClick={handleClick} className="header-btn">Logout</button>
                 </>
             )}
