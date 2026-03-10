@@ -1,13 +1,13 @@
-const {generateMove} = require("../promts/movePromt");
+const {generateMove} = require("../utils/movePromt");
 const {normalizeMove} = require("../utils/normalizeMove");
 
 async function generateMoveText(req,res) {
     //whole body of this funtion is made for test purposes, will be made right later
 
     try{
-        const {playerAns, botBoard} = req.body;
+        const {playerAns, botBoard, botPreset} = req.body;
 
-        const rawRes = await generateMove(playerAns, botBoard)
+        const rawRes = await generateMove(playerAns, botBoard, botPreset)
 
         const jsonMatch = rawRes.match(/```json\s*([\s\S]*?)\s*```/);
         const jsonString = jsonMatch ? jsonMatch[1] : rawRes;
