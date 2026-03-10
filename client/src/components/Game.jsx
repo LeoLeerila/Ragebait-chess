@@ -22,8 +22,14 @@ const Game = () => {
     const location = useLocation();
     const { opponent, playerSide, godmode } = location.state || {};
 
-    //set the starting board so it can be used to build the start of the game
+    //setting up the game
     const [board, setboard] = useState(initBoard);
+    const [castlingRight, setCastlingRight] = useState({
+        K: true,
+        Q: true,
+        k: true,
+        q: true
+    })
     const [turn, setTurn] = useState("white");
     const [selected, setSelected] = useState(null);
     const [history, setHistory] = useState([]);
@@ -77,7 +83,7 @@ const Game = () => {
             const stockfish = new Worker("./stockfish-18-single.js");
             const DEPTH = 10; // number of halfmoves the engine looks ahead, in future i think LLM will decide from ready made options like min 5, max 10
             stockfish.postMessage("uci");
-            stockfish.postMessage(`position fen ${boardToFen(board, turn)}`);
+            stockfish.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`);
             stockfish.postMessage(`go depth ${DEPTH}`);
 
             stockfish.onmessage = (e) => {
@@ -101,7 +107,7 @@ const Game = () => {
                     //this makes the fetch to backend and that then goes to LLM
                     const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
                         botBoard: {
-                            fen: boardToFen(board, turn),
+                            fen: boardToFen(board, turn, castlingRight),
                             currentMoves: bestMove,
                             history: chatH,
                             botChessC: "BLACK"
@@ -130,8 +136,31 @@ const Game = () => {
         speakSomething()
     }, [isPlayerSaid, nextTurn])
 
+    console.log(boardToFen(board, turn, castlingRight))
 
-    console.log(boardToFen(board, turn))
+    function updateCastlingRights(castlingRight, piece, from) {
+        const rights = { ...castlingRight };
+        if (piece === "K") {
+            rights.K = false;
+            rights.Q = false;
+        }
+
+        if (piece === "k") {
+            rights.k = false;
+            rights.q = false;
+        }
+
+        if (piece === "R") {
+            if (from.row === 7 && from.col === 7) rights.K = false;
+            if (from.row === 7 && from.col === 0) rights.Q = false;
+        }
+
+        if (piece === "r") {
+            if (from.row === 0 && from.col === 7) rights.k = false;
+            if (from.row === 0 && from.col === 0) rights.q = false;
+        }
+        return rights;
+    }
 
     //CODE DUMP ALERT: GAME MECHANICS YIPPEE
     function handleSquareClick(square) {
@@ -149,7 +178,7 @@ const Game = () => {
             //something like "if piece colour equal to player colour -> then do shit."
             if ((turn === "white" && isWhite) || (turn === "black" && !isWhite)) {
                 setSelected({ row, col });
-                const highlight = getMoves(board, row, col);
+                const highlight = getMoves(board, row, col, castlingRight);
                 Object.values(highlight).forEach(coord => {
                     const toAlg = coordsToAlg(coord.row, coord.col);
                     //console.log(coord, "->", toAlg);
@@ -170,16 +199,29 @@ const Game = () => {
             return;
         }
         //getMoves returns the result of one of get_Moves in moves.js
-        const legalMoves = getMoves(board, selected.row, selected.col);
-        const isLegal = legalMoves.some(
+        const legalMoves = getMoves(board, selected.row, selected.col, castlingRight);
+        console.log(legalMoves)
+        const isLegal = legalMoves.find(
             move => move.row === row && move.col === col
         );
 
         if (isLegal) {
-            const newBoard = makeMove(board, selected, { row, col });
+            const move = legalMoves.find(
+                m => m.row === row && m.col === col
+            );
+            const newBoard = makeMove(board, selected, move);
+            const piece = board[selected.row][selected.col];
+            const newCastlingRights = updateCastlingRights(
+                castlingRight,
+                piece,
+                selected
+            )
             setboard(newBoard);
+            setCastlingRight(newCastlingRights);
             setTurn(turn === "white" ? "black" : "white");
         }
+
+
         setSelected(null);
         const avElement = document.querySelectorAll('.available');
         avElement.forEach(elem => {
