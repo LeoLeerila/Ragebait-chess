@@ -17,6 +17,7 @@ function UserPanel() {
     const [Name, setName] = useState("")
     const [EMail, setEmail] = useState("")
     const [Password, setPassw] = useState("")
+    const [ProfilePic, setProfilePic] = useState("")
     const [ShowElo, setShowElo] = useState(Boolean)
     const [ShowWL, setShowWL] = useState(Boolean)
     const [ShowDate, setShowDate] = useState(Boolean)
@@ -41,6 +42,7 @@ function UserPanel() {
 
             setName(playerData.playerName)
             setEmail(playerData.email)
+            setProfilePic(settingsData.profilePic)
 
         }
         fetchStuff()
@@ -49,16 +51,25 @@ function UserPanel() {
     const onSubmit = async (e) => {
         e.preventDefault()
 
-        await fetchData("/player","PATCH",token,{
+        const playerUpdate = {
             playerName:Name,
             email:EMail
-        })
+        }
+        
+        // Only include password if it's not empty
+        if (Password.trim()) {
+            playerUpdate.password = Password
+        }
+
+        await fetchData("/player","PATCH",token, playerUpdate)
 
         await fetchData("/settings/update","PATCH",token,{showProfileStats:{
             ShowElo:ShowElo,
             ShowWL:ShowWL,
             ShowDate:ShowDate
-        }})
+        },
+        profilePic:ProfilePic
+    })
         
         setEdit(!openEdit)
     }
@@ -132,7 +143,8 @@ function UserPanel() {
                                             <h2 className="editForm_txt">Edit</h2>
                                             <input type="text" placeholder="Name" value={Name} onChange={(e) => setName(e.target.value)} />
                                             <input type="email" placeholder="Email" value={EMail} onChange={(e) => setEmail(e.target.value)} />
-                                            <input type="txt" placeholder="Password" value={Password} onChange={(e) => setPassw(e.target.value)} />
+                                            <input type="password" placeholder="Password" value={Password} onChange={(e) => setPassw(e.target.value)} />
+                                            <input type="url" placeholder="profile picture URL" value={ProfilePic} onChange={(e) => setProfilePic(e.target.value)}  />
                                             <button className="btn_submit" type="submit" >Submit</button>
                                         </form>
                                     </div>
@@ -156,7 +168,7 @@ function UserPanel() {
                             <p>Username: {playerD.playerName}</p>
                             <p>Email: {playerD.email}</p>
                             {/*<p>Password: {playerD.password}</p>*/}
-                            <p>Profile picture:<br /><img src={settingsD.profilePic} alt="profilepic" /></p>
+                            <p>Profile picture:<br /><img className="profile_pic_edit" src={settingsD.profilePic} alt="profilepic" /></p>
                             <p>Display on profile:</p>
                         </div>
                         <div className="user_panel_side_txt">

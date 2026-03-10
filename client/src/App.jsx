@@ -1,3 +1,7 @@
+import { useState } from "react"
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import './App.css';
+// pages and components
 import UserPanel from "./components/userPanel";
 import LandingPage from "./components/LandingPage";
 import RegisterForm from "./components/Register";
@@ -5,23 +9,24 @@ import LoginForm from "./components/Login";
 import Header from "./components/Header";
 import GameStart from './components/gameStart';
 import Game from './components/Game';
-import { Route, Routes } from "react-router-dom";
-import './App.css';
-
 
 function App() {
+  const [ isAuthenticated, setIsAuthenticated ] = useState(() => {const user = JSON.parse(localStorage.getItem("user"))
+return user && user.token ? true:false});
   return (
-    <>
-      <Header />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/register" element={<RegisterForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/start" element={<GameStart />} />
-          <Route path="/game" element={<Game />} />
-          <Route path="/user" element={<UserPanel />} />
-        </Routes>
-    </>
+    <div className="App">
+      <Header isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+      <div className="content">
+      <Routes>
+        <Route path="/" element={<LandingPage isAuthenticated={isAuthenticated} />} />
+        <Route path="/register" element={isAuthenticated ? (<Navigate to="/" />) : (<RegisterForm setIsAuthenticated={setIsAuthenticated} />)} />
+        <Route path="/login" element={isAuthenticated ? (<Navigate to="/" />) : (<LoginForm setIsAuthenticated={setIsAuthenticated} />)} />
+        <Route path="/start" element={isAuthenticated ? <GameStart /> : <Navigate to="/login" />} />
+        <Route path="/game" element={isAuthenticated ? <Game /> : <Navigate to="/login" />} />
+        <Route path="/user/:PlayerId" element={isAuthenticated ? <UserPanel /> : <Navigate to="/login" />} />
+      </Routes>
+      </div>
+    </div>
   )
 }
 

@@ -1,17 +1,13 @@
 import {useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
+import useFetchBetter from "./hooks/useFetchBetter.js";
 
-//simple registration form function taking inspiration from the first coding marathon's BookCollectionManager.jsx
-function RegisterForm() {
+
+function RegisterForm({ setIsAuthenticated }) {
     //state object
-    const navigate = useNavigate();
-    const [form, setForm] = useState({
-        displayname: "",
-        email: "",
-        password: "",
-        confirmPassword: ""
-    });
+    const { fetchData, isLoading, error } = useFetchBetter(`api`);
+    const [form, setForm] = useState({ displayname: "", email: "", password: "", confirmPassword: "" });
     //updates correct field upon typing
     function handleChange(event) {
         setForm({...form, [event.target.name]: event.target.value});
@@ -27,26 +23,17 @@ function RegisterForm() {
         alert("Passwords do not match");
         return;
         }
-        const response = await fetch("/api/player/signup", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                playerName: form.displayname,
-                email: form.email,
-                password: form.password
-            })
-        })
-        const data = await response.json();
-        if (!response.ok) {
-            console.error("Error registering player:", data);
-            return;
+        const data = await fetchData("/player/signup", "POST", null, {
+            playerName: form.displayname,
+            email: form.email,
+            password: form.password
+        });
+            
+        if (data) {
+            localStorage.setItem("user", JSON.stringify(data));
+            setIsAuthenticated(true);
+            console.log("Response from backend:", data);
         }
-        console.log("Submission succesful:", form);
-        localStorage.setItem("user", JSON.stringify(data));
-        console.log("Response from backend:", data);
-        navigate("/")
     }
 
 //html section

@@ -1,11 +1,12 @@
 import {useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import useFetchBetter from "./hooks/useFetchBetter.js";
 
 //simple login form function made based on Register.jsx
-function LoginForm() {
+function LoginForm({setIsAuthenticated}) {
     //state object
-    const navigate = useNavigate();
+    const { fetchData, isLoading, error } = useFetchBetter(`api`);
     const [form, setForm] = useState({
         email: "",
         password: "",
@@ -18,25 +19,17 @@ function LoginForm() {
     async function handleSubmit(event) {
         //prevent page reloading upon submission
         event.preventDefault();
-        const response = await fetch("api/player/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: form.email,
-                password: form.password
-            })
-        })
-        const user = await response.json();
-        if (!response.ok) {
-            console.error("Error logging in:", user);
-            return;
+        console.log("Login attempt:", form);
+        const data = await fetchData("/player/login", "POST", null, {
+            email: form.email,
+            password: form.password
+        });
+            
+        if (data) {
+            localStorage.setItem("user", JSON.stringify(data));
+            setIsAuthenticated(true)
+            console.log("Response from backend:", data);
         }
-        console.log("Login succesful:", form);
-        localStorage.setItem("user", JSON.stringify(user));
-        console.log("Response from backend:", user);
-        navigate("/")
     }
 
 //html section
@@ -44,6 +37,7 @@ function LoginForm() {
         <div className="login-container">
             <form className="input-section" onSubmit={handleSubmit}>
                 <h1>Log in to begin playing!</h1>
+                {error && <p className="error-message">{error}</p>}
                 <input
                 type="email"
                 name="email"
@@ -62,8 +56,8 @@ function LoginForm() {
                 className="input-field"
                 required
                 />
-                <button type="submit" className="login-button">
-                    Sign in
+                <button type="submit" className="login-button" disabled={isLoading}>
+                    {isLoading ? "Signing in..." : "Sign in"}
                 </button>
                 {/*this should have a link to the registration page*/}
                 <p className="register-text">Don't have an account yet? <Link to="/register">Click here to register an account.</Link></p>

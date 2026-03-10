@@ -6,6 +6,17 @@ header {
     background-color: #393B45;
 }
 
+.game-title {
+    padding-left: 1rem;
+    color: #9FC5E0;
+    text-decoration: none;
+}
+
+a:hover, a:visited, a:link, a:active
+{
+    text-decoration: none;
+}
+
 .header-title {
     font-size: 0.75rem;
     padding-left: 1rem;
