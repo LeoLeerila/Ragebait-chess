@@ -1,5 +1,5 @@
 import './Game.css'
-import { React, use, useEffect, useState } from 'react'
+import { React, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
@@ -8,7 +8,6 @@ import GameOver from './gameOver';
 import ChatTxt from "./gameChat";
 import useFetchBetter from "./hooks/useFetchBetter";
 
-// import useFish from './hooks/useFish';
 
 //these are dummydata for use before database
 import { algToCoords, coordsToAlg, boardToFen } from './logic/helps';
@@ -40,6 +39,8 @@ const Game = () => {
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
+    const [evaluate, setEval] = useState(null);
+    const [saveGame, setSaveGame] = useState(null);
 
     //Goodbye chat
     //Chat states
@@ -68,10 +69,16 @@ const Game = () => {
             const settingsData = await fetchData('/settings/', "GET", token)
             const opponentData = await fetchData(`/aiPreset/${aiId}`)
 
+            
+
             setOpponent(opponentData);
             setPlayerD(playerData);
             setStatsD(statsData);
             setSettingsD(settingsData);
+
+
+            const saveGame = await fetchData("/savegame/", "POST", token, {playerId:playerData._id,playerColor:playerSide,boardState:turn,moveHistory:})
+
         }
         fetchStuff()
     }, [])
@@ -98,6 +105,8 @@ const Game = () => {
                 }
             }
         };
+
+        
 
     }, [turn])
 

@@ -7,19 +7,25 @@ import useFetchBetter from "./hooks/useFetchBetter";
 //get BOT LIST data
 
 const GameStart = () => {
+    const { fetchData, isLoading, error } = useFetchBetter(`http://localhost:4000/api`)
     const [formError, setFormError] = useState("");
     const [playerSide, setPlayerSide] = useState(null);
     const [godmode, setGodmode] = useState(false);
     const [bots, setBots] = useState([])
-    const{fetchData, isLoading, error} = useFetchBetter(`http://localhost:4000/api`)
 
     useEffect(()=>{
         const fetchStuff = async () => {
             const data = await fetchData("/aiPreset/")
             setBots(data)
+            const playerGames = await fetchData('/savegame/', "GET", token)
+            setSavegames(playerGames);
         }
         fetchStuff()
     },[])
+    const [savegames, setSavegames] = useState([]);
+    const [selectGame, setSelectGame] = useState(null);
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = user ? user.token : null;
 
     const navigate = useNavigate();
     const moveToGame = (e) => {
@@ -33,16 +39,22 @@ const GameStart = () => {
             state: { 
                 aiId: selectOpponent._id,
                 playerSide,
+                selectGame,
                 godmode 
             } 
         });
+    }
+
+    const continueGame = (game) => {
+        setPlayerSide(game.playerColor)
+        setSelectOpponent(game.aiPresetId)
+        setSelectGame(game.boardState)
     }
     //handle bot lists, arrange the user choices (bot, position and any extras) and somehow utilize that data for the game screen
     const [selectOpponent, setSelectOpponent] = useState(null);
     const handleSelect = (bot) => {
         setSelectOpponent(bot);
     }
-
     return (
         <div className="game-start-base">
             <div className="top-searchBar">
@@ -106,6 +118,22 @@ const GameStart = () => {
                                 />
                             <p id="GODMODE-warning" title="GODMODE means that the chess bot will be allowed to make illegal moves. Not recommended for serious gameplay.">&#9888;</p>
                         </div>
+                        {savegames.length > 0 ? (
+                            <>
+                                <div className="savegames">
+                                    <p>Hold on! You have some unfinished games! Click on one tom continue playing:</p>
+                                    {savegames.map((game, i) => {
+                                        <div className="game-card" onClick={() => continueGame(game)}>
+                                           
+                                            <p>{i + 1}. Playing against {game.aiPresetId} </p>
+                                        </div>
+                                    })}
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                            </>
+                        )}
                     </div>
                     <button type="submit" id="start-game">Start Game!</button>
                 </div>
