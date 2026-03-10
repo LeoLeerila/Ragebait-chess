@@ -83,7 +83,8 @@ const Game = () => {
             handleBotThink(true) //self explanatory. it works, trust me
             
             stockfish.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`);
-            stockfish.postMessage(`go depth ${opponent.aistats?.depth} Skill Level ${opponent.aistats?.skill}`);
+            console.log(`go depth ${opponent.aistats?.Depth} Skill Level ${opponent.aistats?.Skill}`)
+            stockfish.postMessage(`go depth ${opponent.aistats?.Depth} Skill Level ${opponent.aistats?.Skill} movetime 10000`);
             stockfish.onmessage = (e) => {
                 let data = e.data
                 console.log(data)
@@ -114,7 +115,7 @@ const Game = () => {
                             history: chatH,
                             botChessC: "BLACK"
                         },
-                        botPreset: { AiName: "Evil Larry", info: "A temperamental, evil cat overlord known as Larry.", botElo: "1200" },
+                        botPreset: { AiName: opponent.aiName, info: opponent.systemPrompt, botElo: opponent.aistats?.ELO },
                         playerAns: chatP,
                         playerMove: "Needs to be added"
                     })
