@@ -278,7 +278,7 @@ const Game = () => {
                 <div className="board-wrapper">
                     <div className="board-header"></div>
                     <div className="chess-board">
-                        <Chessboard board={board} squareClick={handleSquareClick} selected={selected} />
+                        <Chessboard board={board} squareClick={handleSquareClick} selected={selected} playAsBlack={playerSide} />
                     </div>
                     <div className="board-footer"></div>
                 </div>
