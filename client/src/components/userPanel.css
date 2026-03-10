@@ -16,6 +16,13 @@ p {
   height: auto;
 }
 
+.profile_pic_edit {
+  max-width: 150px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+}
+
 .user_panel_inner {
   border: 5px solid #D9D9D9;
   background-color:#D9D9D9;

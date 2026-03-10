@@ -168,7 +168,7 @@ function UserPanel() {
                             <p>Username: {playerD.playerName}</p>
                             <p>Email: {playerD.email}</p>
                             {/*<p>Password: {playerD.password}</p>*/}
-                            <p>Profile picture:<br /><img class="profile_pic" src={settingsD.profilePic} alt="profilepic" /></p>
+                            <p>Profile picture:<br /><img className="profile_pic_edit" src={settingsD.profilePic} alt="profilepic" /></p>
                             <p>Display on profile:</p>
                         </div>
                         <div className="user_panel_side_txt">
