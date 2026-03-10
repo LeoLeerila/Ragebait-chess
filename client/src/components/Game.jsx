@@ -3,7 +3,7 @@ import { React, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 import Chessboard from './Chessboard';
 import { initBoard } from '../assets/initBoard';
-import { getMoves, makeMove } from './logic/moves';
+import { getMoves, makeMove, hasLegalMoves } from './logic/moves';
 import GameOver from './gameOver';
 import ChatTxt from "./gameChat";
 import useFetchBetter from "./hooks/useFetchBetter";
@@ -142,6 +142,14 @@ const Game = () => {
             )
             setboard(newBoard);
             setCastlingRight(newCastlingRights);
+
+            const nextTurn = turn === "white" ? "black" : "white";
+            if(hasLegalMoves(newBoard, nextTurn, newCastlingRights) === false) {
+                setGameOver(true);
+                setWinner(turn);
+                setMethod("Checkmated!")
+            }
+
             setTurn(turn === "white" ? "black" : "white");
         }
 

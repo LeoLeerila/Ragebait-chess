@@ -84,7 +84,6 @@ function isInCheck(board, colour, castlingRight) {
     return false;
 }
 
-
 // ---- Piece movements
 //check move legalities here
 function getPawnMoves(board, row, col) {
@@ -224,6 +223,33 @@ function pseudoMoves(board, row, col, castlingRight) {
         default: return [];
     }
 }
+
+//purpose: check for checkmate in Game.jsx
+export function hasLegalMoves(board, colour, castlingRight) {
+    if (!isInCheck(board, colour, castlingRight)) {
+        return true;
+    }
+    let moves = [];
+    for(let row = 0; row < 8; row++) {
+        for(let col = 0; col < 8; col++){
+            const piece = board[row][col];
+            if(!piece) continue;
+            
+            if(
+                (colour === "white" && !isWhite(piece)) ||
+                (colour === "black" && isWhite(piece))
+            ) continue;
+
+            const allMoves = getMoves(board, row, col, castlingRight)
+            allMoves.forEach(m => {
+                moves.push(m);
+            })
+            if (moves.length === 0) return false;
+        }
+    }
+    return moves;
+}
+
 // make the check for legal moves
 export function getMoves(board, row, col, castlingRight) {
     const piece = board[row][col];
