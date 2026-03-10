@@ -31,12 +31,14 @@ const Game = () => {
         q: true
     })
     const [turn, setTurn] = useState("white");
+    const [capturedWhite, setCapturedWhite] = useState([]);
+    const [capturedBlack, setCapturedBlack] = useState([]);
     const [selected, setSelected] = useState(null);
     const [history, setHistory] = useState([]);
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
-    
+
     //Goodbye chat
     //Chat states
     const [chatH, setChatH] = useState([]); // [{Answer: "Greetings type to type here or something like that", isLLMAnswer: true},{Answer: "Greetings", isLLMAnswer: false}] 
@@ -120,9 +122,38 @@ const Game = () => {
 
                 const start = bestMove.slice(0, 2)
                 const end = bestMove.slice(2)
+                //console.log(algToCoords(end))
+                const botStart = algToCoords(start)
+                const botMove = algToCoords(end)
+                const capturedPiece = board[botMove.row][botMove.col];
+                if (capturedPiece) {
+                    console.log("HEELPPP. HEELPP MEEE!!!! -", board[botMove.row][botMove.col])
+                    if (capturedPiece === capturedPiece.toUpperCase()) {
+                        setCapturedWhite(capturedPiece)
+                    } else {
+                        setCapturedBlack(capturedPiece)
+                    }
+                }
 
                 const newBoard = makeMove(board, algToCoords(start), algToCoords(end));
                 setboard(newBoard);
+                const piece = board[botStart.row][botStart.col];
+                //console.log(piece)
+                const newCastlingRights = updateCastlingRights(
+                    castlingRight,
+                    piece,
+                    botStart
+                )
+                setCastlingRight(newCastlingRights);
+
+                const nextTurn = turn === "white" ? "black" : "white";
+                if (isInCheck(newBoard, nextTurn, newCastlingRights) && !hasLegalMoves(newBoard, nextTurn, newCastlingRights)) {
+                    console.log("RAHHHHHH")
+                    setGameOver(true);
+                    setWinner(turn);
+                    setMethod("Checkmated!")
+                }
+                
                 setTurn(turn === "white" ? "black" : "white");
 
                 setNextTurn(false)
@@ -208,8 +239,20 @@ const Game = () => {
                 const move = legalMoves.find(
                     m => m.row === row && m.col === col
                 );
+                //check if there's apiece where we're abt to move
+                const capturedPiece = board[move.row][move.col];
+                if (capturedPiece) {
+                    console.log("HEELPPP. HEELPP MEEE!!!! -", board[move.row][move.col])
+                    if (capturedPiece === capturedPiece.toUpperCase()) {
+                        setCapturedWhite(capturedPiece)
+                    } else {
+                        setCapturedBlack(capturedPiece)
+                    }
+                }
+
                 const newBoard = makeMove(board, selected, move);
                 const piece = board[selected.row][selected.col];
+                console.log(piece)
                 const newCastlingRights = updateCastlingRights(
                     castlingRight,
                     piece,
@@ -218,12 +261,12 @@ const Game = () => {
                 setboard(newBoard);
                 setCastlingRight(newCastlingRights);
 
-            const nextTurn = turn === "white" ? "black" : "white";
-            if(isInCheck(newBoard, nextTurn, newCastlingRights) && !hasLegalMoves(newBoard, nextTurn, newCastlingRights)) {
-                setGameOver(true);
-                setWinner(turn);
-                setMethod("Checkmated!")
-            }
+                const nextTurn = turn === "white" ? "black" : "white";
+                if (isInCheck(newBoard, nextTurn, newCastlingRights) && !hasLegalMoves(newBoard, nextTurn, newCastlingRights)) {
+                    setGameOver(true);
+                    setWinner(turn);
+                    setMethod("Checkmated!")
+                }
 
                 setTurn(turn === "white" ? "black" : "white");
             }
