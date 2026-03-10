@@ -20,10 +20,10 @@ function LoginForm({setIsAuthenticated}) {
         //prevent page reloading upon submission
         event.preventDefault();
         console.log("Login attempt:", form);
-        const data = await fetchData("/player/login", "POST", null, JSON.stringify({
+        const data = await fetchData("/player/login", "POST", null, {
             email: form.email,
             password: form.password
-        }));
+        });
             
         if (data) {
             localStorage.setItem("user", JSON.stringify(data));

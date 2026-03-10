@@ -23,11 +23,11 @@ function RegisterForm({ setIsAuthenticated }) {
         alert("Passwords do not match");
         return;
         }
-        const data = await fetchData("/player/signup", "POST", null, JSON.stringify({
+        const data = await fetchData("/player/signup", "POST", null, {
             playerName: form.displayname,
             email: form.email,
             password: form.password
-        }));
+        });
             
         if (data) {
             localStorage.setItem("user", JSON.stringify(data));
