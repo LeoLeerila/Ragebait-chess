@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import useFetchBetter from "./hooks/useFetchBetter";
 import { Link } from "react-router-dom";
 import "./userPanel.css";
 
 
 
-function UserPanel() {
+function UserPanel(setIsAuthenticated) {
+    const navigate = useNavigate();
     const [playerD, setPlayerD] = useState({});
     const [settingsD, setSettingsD] = useState({});
     const [statsD, setStatsD] = useState({});
@@ -79,8 +80,24 @@ function UserPanel() {
     }
 
 
+const handleDelete = async (e) => {
+    e.preventDefault();
 
+    const confirmed = window.confirm(
+        "Are you sure you want to delete your profile?"
+    );
 
+    if (!confirmed) return;
+    try {
+        await fetchData("/player", "DELETE", token);
+
+        localStorage.removeItem("user");
+        
+        navigate("/")
+    } catch (error) {
+    console.error("Failed to delete profule:", error);
+    }
+}
     return (
         <section className="user_panel" id="user_panel">
             <div className="user_panel_inner" id="user_panel_profile">
@@ -172,8 +189,7 @@ function UserPanel() {
                             <p>Display on profile:</p>
                         </div>
                         <div className="user_panel_side_txt">
-                            <p>Reset profile?</p>
-                            <p>Delete profile?</p>
+                            <button className="btn_open_edit" onClick ={handleDelete}>Delete profile?</button>
                         </div>
                     </div>
                 </div>
