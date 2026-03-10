@@ -11,17 +11,7 @@ const GameStart = () => {
     const [formError, setFormError] = useState("");
     const [playerSide, setPlayerSide] = useState(null);
     const [godmode, setGodmode] = useState(false);
-    const [bots, setBots] = useState([])
-
-    useEffect(()=>{
-        const fetchStuff = async () => {
-            const data = await fetchData("/aiPreset/")
-            setBots(data)
-            const playerGames = await fetchData('/savegame/', "GET", token)
-            setSavegames(playerGames);
-        }
-        fetchStuff()
-    },[])
+    const [bots, setBots] = useState([]);
     const [savegames, setSavegames] = useState([]);
     const [selectGame, setSelectGame] = useState(null);
     const user = JSON.parse(localStorage.getItem("user"));
@@ -48,13 +38,25 @@ const GameStart = () => {
     const continueGame = (game) => {
         setPlayerSide(game.playerColor)
         setSelectOpponent(game.aiPresetId)
-        setSelectGame(game.boardState)
+        //setSelectGame(game.boardState)
+        setSelectGame(game._id)
     }
+    
     //handle bot lists, arrange the user choices (bot, position and any extras) and somehow utilize that data for the game screen
     const [selectOpponent, setSelectOpponent] = useState(null);
     const handleSelect = (bot) => {
         setSelectOpponent(bot);
     }
+    useEffect(()=>{
+        const fetchStuff = async () => {
+            const data = await fetchData("/aiPreset/")
+            setBots(data)
+            const playerGames = await fetchData('/savegame/', "GET", token)
+            setSavegames(playerGames);
+        }
+        fetchStuff()
+    },[])
+
     return (
         <div className="game-start-base">
             <div className="top-searchBar">

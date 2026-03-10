@@ -20,8 +20,7 @@ const Game = () => {
     //useLocation: get the shit from gameStart.jsx through 'state'
     const navigate = useNavigate();
     const location = useLocation();
-    const { aiId, playerSide, godmode } = location.state || {};
-    
+    const { aiId, playerSide, selectGame, godmode } = location.state || {};
 
     //setting up the game
     const [board, setboard] = useState(initBoard);
@@ -40,7 +39,7 @@ const Game = () => {
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
     const [evaluate, setEval] = useState(null);
-    const [saveGame, setSaveGame] = useState(null);
+    const [saveGameId, setSaveGameId] = useState(null);
 
     //Goodbye chat
     //Chat states
@@ -60,25 +59,32 @@ const Game = () => {
     const [bestMove, setBestMove] = useState("");
     const [nextTurn, setNextTurn] = useState(false);
 
-    //useEffect wall
+    //useEffect wall and i have done some unspeakable stuff to get this shit working, btw my soul now belongs to machine gods -oleruu
     // This load player info
     useEffect(() => {
         const fetchStuff = async () => {
+
             const playerData = await fetchData('/player/', "GET", token)
             const statsData = await fetchData('/stats/', "GET", token)
             const settingsData = await fetchData('/settings/', "GET", token)
-            const opponentData = await fetchData(`/aiPreset/${aiId}`)
-
-            
-
-            setOpponent(opponentData);
             setPlayerD(playerData);
             setStatsD(statsData);
             setSettingsD(settingsData);
 
-
-            const saveGame = await fetchData("/savegame/", "POST", token, {playerId:playerData._id,playerColor:playerSide,boardState:turn,moveHistory:})
-
+            if (selectGame === null) {
+                setboard(initBoard)
+                const opponentData = await fetchData(`/aiPreset/${aiId}`)
+                setOpponent(opponentData);
+                const saveGame = await fetchData("/savegame/", "POST", token, { playerId: settingsData.playerId, playerColor: playerSide, boardState: turn, moveHistory: JSON.stringify(history), board: JSON.stringify(board), chatHistory: JSON.stringify(chatH), aiPresetId: aiId })
+                setSaveGameId(saveGame._id)
+            } else {
+                const savedGame = await fetchData(`/savegame/${selectGame}`, "GET", token)
+                console.log(savedGame)
+                setboard(JSON.parse(savedGame.board))
+                setTurn(savedGame.boardState)
+                setHistory(JSON.parse(savedGame.moveHistory))
+                setChatH(JSON.parse(savedGame.chatHistory))
+            }
         }
         fetchStuff()
     }, [])
@@ -89,7 +95,7 @@ const Game = () => {
         if (playerSide !== turn) {
             setChatP("") //clear chat
             handleBotThink(true) //self explanatory. it works, trust me
-            
+
             stockfish.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`);
             console.log(`go depth ${opponent.aistats?.Depth} Skill Level ${opponent.aistats?.Skill}`)
             stockfish.postMessage(`go depth ${opponent.aistats?.Depth} Skill Level ${opponent.aistats?.Skill} movetime 10000`);
@@ -100,14 +106,21 @@ const Game = () => {
                     data = data.split(" ")[1] //makes "bestmove c7c6 ponder b5a4" => "c7c6"
                     console.log(data)
                     setBestMove(data)
-                    handleBotThink(false)
+                    handleBotThink(false)   
                     stockfish.terminate() // Exterminate!, Exterminate!, Exterminate!, Exterminate!
+
                 }
             }
         };
 
-        
 
+        if (saveGameId !== null){
+            fetchData(`/savegame/${saveGameId}`, "PATCH", token, { playerColor: playerSide, boardState: turn, moveHistory: JSON.stringify(history), board: JSON.stringify(board), chatHistory: JSON.stringify(chatH), aiPresetId: aiId })
+        }else{
+            console.log("SaveGameId is null, something went wrong somewhere, don't ask idk")
+        }
+        
+        
     }, [turn])
 
     useEffect(() => {
@@ -115,7 +128,7 @@ const Game = () => {
             handleBotThink(true, "Bot is thinkig")
             if (playerSide !== turn) {
                 if (isPlayerSaid) {
-                    
+
                     //do here the uhh the that uhh thing ... the bot
                     //this makes the fetch to backend and that then goes to LLM
                     const data = await fetchData('/ai/generate-nxt-move', "POST", token, {
@@ -135,10 +148,11 @@ const Game = () => {
 
                 const start = bestMove.slice(0, 2)
                 const end = bestMove.slice(2)
-                //console.log(algToCoords(end))
+                
                 const botStart = algToCoords(start)
                 const botMove = algToCoords(end)
                 const capturedPiece = board[botMove.row][botMove.col];
+
                 if (capturedPiece) {
                     console.log("HEELPPP. HEELPP MEEE!!!! -", board[botMove.row][botMove.col])
                     if (capturedPiece === capturedPiece.toUpperCase()) {
