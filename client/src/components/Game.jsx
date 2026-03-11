@@ -38,7 +38,7 @@ const Game = () => {
     const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
     const [method, setMethod] = useState(null);
-    const [evaluate, setEval] = useState(10.0); //floati use this for the eval bar like %, i would do but i don't wanna touch css.
+    const [evaluate, setEval] = useState(50.0); //floati use this for the eval bar like %, i would do but i don't wanna touch css aaaaaand i did it >:(
     const [saveGameId, setSaveGameId] = useState(null);
 
     //Goodbye chat
@@ -441,8 +441,8 @@ const Game = () => {
 
                 {/* Eval bar */}
                 <div className="eval-bar">
-                    <div className="eval-fill black" />
-                    <div className="eval-fill white" />
+                    <div className="eval-fill black" style={{height: evaluate }}/>
+                    <div className="eval-fill white" style={{height: (100-evaluate) }}  />
                 </div>
 
             </div>
