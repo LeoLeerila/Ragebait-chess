@@ -1,34 +1,40 @@
 import {useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Register.css";
+import useFetchBetter from "./hooks/useFetchBetter.js";
 
-//simple registration form function taking inspiration from the first coding marathon's BookCollectionManager.jsx
-function RegisterForm() {
+
+function RegisterForm({ setIsAuthenticated }) {
     //state object
-    const [form, setForm] = useState({
-        displayname: "",
-        email: "",
-        password: "",
-        confirmPassword: ""
-    });
+    const { fetchData, isLoading, error } = useFetchBetter(`api`);
+    const [form, setForm] = useState({ displayname: "", email: "", password: "", confirmPassword: "" });
+    const [localError, setLocalError] = useState(null)
     //updates correct field upon typing
     function handleChange(event) {
         setForm({...form, [event.target.name]: event.target.value});
     }
     //handles form submission
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         //prevent page reloading upon submission
         event.preventDefault();
         //very simple check if passwords match
         //should also maybe make some kind of notification if email is not a properly formatted email. input type="email" sort of takes care of this but doesn't actually give any kind of indication besides not allowing the submission of the form.
+        setLocalError(null);
         if (form.password !== form.confirmPassword) {
-        //this alert should probably be changed to something better looking later on
-        alert("Passwords do not match");
+            setLocalError("Passwords do not match");
         return;
         }
-        //for now this just console logs a succesful registration and shows the values submitted
-        console.log("Submission succesful:", form);
-        //this is probably where the logic for sending registration data to the backend would go, once it's time for that
+        const data = await fetchData("/player/signup", "POST", null, {
+            playerName: form.displayname,
+            email: form.email,
+            password: form.password
+        });
+            
+        if (data) {
+            localStorage.setItem("user", JSON.stringify(data));
+            setIsAuthenticated(true);
+            console.log("Response from backend:", data);
+        }
     }
 
 //html section
@@ -36,6 +42,7 @@ function RegisterForm() {
         <div className="register-container">
             <form className="input-section" onSubmit={handleSubmit}>
                 <h1>Register to begin playing!</h1>
+                {localError || error && <p className="error-message">{localError || error}</p>}
                 <input
                 type="text"
                 name="displayname"

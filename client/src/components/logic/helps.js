@@ -16,7 +16,7 @@ export function algToCoords(square) {
     return { row, col}
 }
 
-export function boardToFen(board, turn) {
+export function boardToFen(board, turn, castlingRight) {
     let result = "";
     //left -> right, top to bottom
     for(let row = 0; row < 8; row++) {
@@ -33,15 +33,18 @@ export function boardToFen(board, turn) {
                result += piece; //should be ok because board usestate already has upper and lower capital letters
             }
         }
-        if(empty > 0) {
-            result += empty.toString();
-        }
-        if (row < 7) {
-            result += '/'
-        }
+        if(empty > 0) result += empty.toString();
+        if (row < 7) result += '/';
     }
     let t = turn === "white" ? "w" : "b";
-                        //able to castle
-    result += ' ' + t +  ' KQkq - 0 1';
+    let castling = "";
+    console.log(castlingRight)
+    if (castlingRight.K) castling += "K";
+    if (castlingRight.Q) castling += "Q";
+    if (castlingRight.k) castling += "k";
+    if (castlingRight.q) castling += "q";
+    if (castling === "") castling = "-";
+    
+    result +=  ` ${t} ${castling} - 0 1`;
     return result;
 }

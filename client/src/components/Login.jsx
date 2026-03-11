@@ -1,10 +1,12 @@
 import {useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Login.css";
+import useFetchBetter from "./hooks/useFetchBetter.js";
 
 //simple login form function made based on Register.jsx
-function LoginForm() {
+function LoginForm({setIsAuthenticated}) {
     //state object
+    const { fetchData, isLoading, error } = useFetchBetter(`api`);
     const [form, setForm] = useState({
         email: "",
         password: "",
@@ -14,12 +16,20 @@ function LoginForm() {
         setForm({...form, [event.target.name]: event.target.value});
     }
     //handles form submission
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         //prevent page reloading upon submission
         event.preventDefault();
-        //for now this just console logs a succesful log in attempt and shows the values submitted
-        console.log("Login succesful:", form);
-        //this is probably where the logic for sending the login request to the backend would go, once it's time for that
+        console.log("Login attempt:", form);
+        const data = await fetchData("/player/login", "POST", null, {
+            email: form.email,
+            password: form.password
+        });
+            
+        if (data) {
+            localStorage.setItem("user", JSON.stringify(data));
+            setIsAuthenticated(true)
+            console.log("Response from backend:", data);
+        }
     }
 
 //html section
@@ -27,6 +37,7 @@ function LoginForm() {
         <div className="login-container">
             <form className="input-section" onSubmit={handleSubmit}>
                 <h1>Log in to begin playing!</h1>
+                {error && <p className="error-message">{error}</p>}
                 <input
                 type="email"
                 name="email"
@@ -45,8 +56,8 @@ function LoginForm() {
                 className="input-field"
                 required
                 />
-                <button type="submit" className="login-button">
-                    Sign in
+                <button type="submit" className="login-button" disabled={isLoading}>
+                    {isLoading ? "Signing in..." : "Sign in"}
                 </button>
                 {/*this should have a link to the registration page*/}
                 <p className="register-text">Don't have an account yet? <Link to="/register">Click here to register an account.</Link></p>

@@ -1,12 +1,12 @@
 const Bot = ({bot, onSelect}) => {
-    const {AIName, info, AIPic, AIElo} = bot;
+    const {aiName, aiDescription, aiPic, aistats} = bot;
     return (
         <li className="bot" onClick={() => onSelect(bot)}>
-            <img src={AIPic} alt={AIPic} />
+            <img src={aiPic} alt={aiPic} />
             <div className="bot-column">
-                <h4>{AIName}</h4>
-                <p className="bot-info">{info}</p>
-                <p className="bot-elo">{AIElo}</p>
+                <h4>{aiName}</h4>
+                <p className="bot-info">{aiDescription}</p>
+                <p className="bot-elo">{aistats.ELO}</p>
             </div>
         </li>
     )

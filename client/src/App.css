@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Kameron:wght@400..700&display=swap');
+
 :root {
   --dark-colour: #393B45;
   --grey-colour: #7C808A;
@@ -7,7 +9,11 @@
 }
 
 body {
+  font-family: "Kameron", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
   margin: 0;
   padding: 0;
   background-color: var(--light-colour);
 }
+

@@ -1,2 +1,5 @@
 backend/node_modules/
 client/node_modules/
+backend/.env
+client/public/stockfish-18-single.js
+client/public/stockfish-18-single.wasm

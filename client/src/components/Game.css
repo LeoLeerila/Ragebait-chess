@@ -26,9 +26,11 @@
 
 .board-header,
 .board-footer {
+    display: flex;
     height: 2rem;
     background-color: var(--grey-colour)
 }
+
 .move-history {
     padding: 5px;
     justify-content: space-between;
@@ -50,10 +52,13 @@
 }
 
 /* Highlight the selected chess tiles */
-.square.light.selected, .square.light.available {
+.square.light.selected,
+.square.light.available {
     background-color: var(--selected-light) !important;
 }
-.square.dark.selected, .square.dark.available {
+
+.square.dark.selected,
+.square.dark.available {
     background-color: var(--selected-dark) !important;
 }
 
@@ -70,14 +75,29 @@
     font-size: 40px;
 }
 
+.mini .piece {
+    font-size: 25px;
+}
+
 .move-history {
     background-color: var(--grey-colour);
     height: 48px;
+    width: 470px;
     margin-top: 8px;
     overflow-x: auto;
     overflow-y: hidden;
     display: flex;
     align-items: center;
+}
+
+.history-row {
+    display: flex;
+    width: 75%;
+    overflow-x: auto;
+}
+
+.history-item {
+    padding: 5px;
 }
 
 /* RIGHT PANEL */
@@ -88,11 +108,20 @@
 }
 
 .chat-column {
+    position: relative;
     display: flex;
     flex-direction: column;
     flex: 1;
+    max-height: 88vh;
     height: 100%;
     background-color: var(--silver-colour);
+    justify-content: space-between;
+}
+
+.chat-window {
+    width: 400px;
+    height: 100%;
+    overflow-y: scroll !important;
 }
 
 /* Player cards */
@@ -196,6 +225,7 @@
     height: 50%;
     background-color: var(--dark-colour);
 }
+
 .eval-fill.white {
     height: 50%;
     background-color: var(--silver-colour);
@@ -215,6 +245,7 @@
     z-index: 1000;
     text-align: center;
 }
+
 .game-over-overlay {
     position: fixed;
     top: 0;
