@@ -87,6 +87,25 @@ const Game = () => {
         }
         fetchStuff()
     }, [])
+    useEffect(() => {
+        let elo
+        if (gameOver) {
+            if (winner === playerSide) {
+                elo = statsD.currentELO + (0.10 * opponent.aistats?.ELO)
+                fetchData("/stats/update", "PATCH", token, { totalMatches: (statsD.totalMatches + 1), wonMatches: (statsD.wonMatches + 1), currentELO:(statsD.currentELO + elo), highestELO:(statsD.currentELO + elo) })
+            } else {
+                elo = statsD.currentELO - (0.10 * opponent.aistats?.ELO)
+                console.log(elo)
+                if(elo <= 0){
+                    elo = 0
+                }
+                fetchData("/stats/update", "PATCH", token, { totalMatches: (statsD.totalMatches + 1), currentELO:(elo) })
+            }
+        } else if (gameOver && method === "Stalemate") {
+            fetchData("/stats/update", "PATCH", token, {totalMatches: (statsD.totalMatches + 1),stalemateMatches: (statsD.stalemateMatches + 1)})
+        }
+
+    }, [gameOver])
 
     //i dont really know what the hell am doing, but it just works -oleruu
     useEffect(() => {
@@ -103,15 +122,15 @@ const Game = () => {
                     data = data.split(" ")[1] //makes "bestmove c7c6 ponder b5a4" => "c7c6"
                     console.log(data)
                     setBestMove(data)
-                    handleBotThink(false)   
+                    handleBotThink(false)
                     stockfish.terminate() // Exterminate!, Exterminate!, Exterminate!, Exterminate!
                 }
             }
         };
         updEval()
-        if (saveGameId !== null){
+        if (saveGameId !== null) {
             fetchData(`/savegame/${saveGameId}`, "PATCH", token, { playerColor: playerSide, boardState: turn, moveHistory: JSON.stringify(history), board: JSON.stringify(board), chatHistory: JSON.stringify(chatH), aiPresetId: aiId })
-        }else{
+        } else {
             console.log("SaveGameId is null, something went wrong somewhere, don't ask idk")
         }
     }, [turn])
@@ -139,7 +158,7 @@ const Game = () => {
 
                 const start = bestMove.slice(0, 2)
                 const end = bestMove.slice(2)
-                
+
                 const botStart = algToCoords(start)
                 const botMove = algToCoords(end)
                 const capturedPiece = board[botMove.row][botMove.col];
@@ -184,31 +203,31 @@ const Game = () => {
         speakSomething()
     }, [isPlayerSaid, nextTurn])
 
-    function updEval(){
+    function updEval() {
         const stockfishEval = new Worker("./stockfish-18-single.js"); // this gets you personal eval to see how shi.. good you play
         stockfishEval.postMessage(`position fen ${boardToFen(board, turn, castlingRight)}`); // there is board to fen, but no fen to board
         stockfishEval.postMessage(`eval`);
-        stockfishEval.onmessage = (e) =>{
+        stockfishEval.onmessage = (e) => {
             let data = e.data
-            if(data.includes("Final")){
+            if (data.includes("Final")) {
                 const numbr = data.split(" ")[8] // hard coded stuff takes Final something => float, hmm i seem doing lot of data manipulation
                 const numbre = parseFloat(numbr.slice(1)) // i wanted to do this on same line but nooooo, i need the + or some other shit
-                if(numbr.includes("+")){ //there is def better way, buuuuuut i don't care.
+                if (numbr.includes("+")) { //there is def better way, buuuuuut i don't care.
                     setEval(evaluate + numbre) // this is some genius level math
-                }else{
+                } else {
                     setEval(evaluate - numbre)
                 }
                 stockfishEval.terminate() // i will be back
             }
         }
-        
+
     }
 
     //console.log(boardToFen(board, turn, castlingRight))
     //piece and move must come in the alg form to not be confusing lmao 
     function trackHistory(piece, move) {
         console.log(piece, move)
-        if(piece==="P" || piece==="p") {
+        if (piece === "P" || piece === "p") {
             setHistory(prev => [...prev, move])
         } else {
             let occurence = `${piece}${move}`;
@@ -441,8 +460,8 @@ const Game = () => {
 
                 {/* Eval bar */}
                 <div className="eval-bar">
-                    <div className="eval-fill black" style={{height: evaluate }}/>
-                    <div className="eval-fill white" style={{height: (100-evaluate) }}  />
+                    <div className="eval-fill black" style={{ height: evaluate }} />
+                    <div className="eval-fill white" style={{ height: (100 - evaluate) }} />
                 </div>
 
             </div>
