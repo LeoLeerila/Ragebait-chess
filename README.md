@@ -1,6 +1,6 @@
 # Ragebait-chess
 
-# Sprint 2 retrospective:
+# Sprint 3 retrospective:
 
 Liked: Daily Scrum, Communication, Starting the implementation of the project, Problem solving.
 Learned: Problem solving, Building a react application, Data delivery through routing, Frontend development.
