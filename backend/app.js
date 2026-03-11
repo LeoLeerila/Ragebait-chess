@@ -26,6 +26,8 @@ dotenv.config();
 
 dotenv.config();
 
+dotenv.config();
+
 app.use(requestLogger);
 
 app.get("/", (req, res) => res.send("API Running!"));
