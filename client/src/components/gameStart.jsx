@@ -3,6 +3,7 @@ import Bot from './BotComponent';
 import { React, useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import useFetchBetter from "./hooks/useFetchBetter";
+import larry from "../assets/larry.png"
 
 //get BOT LIST data
 
@@ -36,10 +37,11 @@ const GameStart = () => {
     }
 
     const continueGame = (game) => {
+        e.preventDefault()
         setPlayerSide(game.playerColor)
         setSelectOpponent(game.aiPresetId)
-        //setSelectGame(game.boardState)
         setSelectGame(game._id)
+        console.log(game.playerColor, game.aiPresetId, game._id)
     }
     
     //handle bot lists, arrange the user choices (bot, position and any extras) and somehow utilize that data for the game screen
@@ -120,23 +122,25 @@ const GameStart = () => {
                                 />
                             <p id="GODMODE-warning" title="GODMODE means that the chess bot will be allowed to make illegal moves. Not recommended for serious gameplay.">&#9888;</p>
                         </div>
+                    </div>
+                    <div> 
                         {savegames.length > 0 ? (
                             <>
                                 <div className="savegames">
                                     <p>Hold on! You have some unfinished games! Click on one tom continue playing:</p>
-                                    {savegames.map((game, i) => {
-                                        <div className="game-card" onClick={() => continueGame(game)}>
-                                           
-                                            <p>{i + 1}. Playing against {game.aiPresetId} </p>
+                                    {console.log(savegames)}
+                                    {savegames.map((game, i) => (
+                                        <div key={i} className="game-card" onClick={(e) => continueGame(game, e)}>
+                                            <p>{i + 1}. Playing against {game.aiPresetId} as {game.playerColor} </p>
                                         </div>
-                                    })}
+                                    ))}
                                 </div>
                             </>
                         ) : (
                             <>
                             </>
                         )}
-                    </div>
+                        </div>
                     <button type="submit" id="start-game">Start Game!</button>
                 </div>
                 {formError && <p className="form-error">{formError}</p>}
